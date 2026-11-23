@@ -1,5 +1,4 @@
 <!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -40,7 +39,7 @@ nav{display:flex;gap:8px;overflow-x:auto;margin:8px 0 12px}
 nav a{flex:none;padding:7px 14px;border:1px solid var(--bd);border-radius:999px;background:var(--card);color:var(--ac);font-size:13px;text-decoration:none}
 @media (max-width:640px){
 main{display:flex;flex-direction:column;padding:12px 12px 32px}
-h1{order:-3;font-size:18px}#sync{order:-2;margin:0 0 4px}nav{order:-1}
+h1{order:-3;font-size:18px}#gh{order:-2}nav{order:-1}
 main>section:nth-of-type(2){order:1}main>section:nth-of-type(3){order:2}main>section:nth-of-type(5){order:3}main>section:nth-of-type(4){order:4}main>section:nth-of-type(6){order:5}main>section:nth-of-type(1){order:6}main>section:nth-of-type(7){order:7}
 .card{padding:12px;margin-bottom:12px;scroll-margin-top:8px}
 input[type=number],input[type=date],input[type=text],select{font-size:16px;min-height:44px}
@@ -59,7 +58,21 @@ td button{width:100%}
 <body>
 <main>
 <h1>TQQQ 무한매수법 주문 계산기</h1>
-<p class="note" id="sync">이 기기에만 저장 중</p>
+<div class="card" id="gh">
+<h2>이력 저장 (GitHub)</h2>
+<div class="row" style="margin-top:0"><button class="pri ghsave">GitHub에 저장</button><button class="ghload">GitHub에서 불러오기</button></div>
+<p class="note gst" id="sync" style="margin:8px 0 0"></p>
+<details id="ghcfg"><summary>GitHub 연결 설정</summary>
+<div class="grid" style="margin-top:8px">
+<label>소유자 (사용자명)<input type="text" id="ghOwner" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+<label>저장소 이름<input type="text" id="ghRepo" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+<label>브랜치<input type="text" id="ghBranch" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+<label>파일 경로<input type="text" id="ghPath" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+<label>액세스 토큰<input type="password" id="ghToken" autocomplete="off"></label>
+<label class="chk"><input type="checkbox" id="ghRem"> 이 기기에 토큰 저장</label>
+</div>
+<p class="note">이력은 위 저장소의 지정한 파일(JSON)에 커밋으로 저장됩니다. 공개 저장소에 저장하면 이력이 누구에게나 보이므로, 이력 전용 비공개(private) 저장소를 따로 만드는 것을 권장합니다. 토큰은 GitHub의 Settings → Developer settings → Fine-grained tokens에서 그 저장소 하나만 선택하고 Contents 권한을 Read and write로 발급하세요. 토큰은 이 기기 브라우저에만 저장되고 저장소에는 올라가지 않습니다. 공용 기기에서는 “이 기기에 토큰 저장”을 끄세요.</p>
+</details></div>
 <nav><a href="#s-order">오늘 주문</a><a href="#fform">체결 기록</a><a href="#s-hist">이력</a><a href="#s-cfg">설정</a></nav>
 
 <section class="card" id="s-cfg">
@@ -116,8 +129,11 @@ td button{width:100%}
 <label>체결 가격 ($)<input type="number" id="fp" step="any"></label>
 <label>수량 (주)<input type="number" id="fq" step="1"></label>
 <label>메모<input type="text" id="fm"></label>
+<label>기록 후 T (선택)<input type="number" id="ftv" step="any" placeholder="비우면 자동"></label>
 </div>
-<div class="row"><button class="pri" id="add">기록 추가</button><span class="note" id="fmsg"></span></div>
+<p class="note" id="tprev"></p>
+<div class="row"><button class="pri" id="add">기록 추가</button><button class="ghsave">GitHub에 저장</button><span class="note" id="fmsg"></span></div>
+<p class="note">T 기록 규칙: 매수는 T에 (매수금 ÷ 그때의 1회 매수금)을 더하고, 일부 매도는 T × (남은 수량 ÷ 기존 수량)으로 줄이며(쿼터 매도는 ×0.75), 전량 매도는 T를 0으로 되돌립니다. 예비금 매수는 T를 바꾸지 않습니다. 원문 값과 다르면 “기록 후 T” 칸에 직접 입력하세요.</p>
 <p class="note">이미 보유 중인 포지션이 있다면 과거 체결을 같은 방식으로 입력하세요. 주문 표의 “체결 입력” 버튼을 누르면 가격과 수량이 자동으로 채워집니다.</p>
 </section>
 
@@ -127,22 +143,14 @@ td button{width:100%}
 <h2 style="font-size:14px">사이클 요약</h2>
 <div class="scroll"><table><thead><tr><th>사이클</th><th>기간</th><th>매수 합계</th><th>매도 합계</th><th>손익</th><th>수익률</th></tr></thead><tbody id="cycles"></tbody></table></div>
 <h2 style="font-size:14px;margin-top:14px">체결 내역</h2>
-<div class="scroll"><table><thead><tr><th>날짜</th><th>구분</th><th>가격</th><th>수량</th><th>금액</th><th>메모</th><th></th></tr></thead><tbody id="hist"></tbody></table></div>
-<div class="row"><button id="csv">CSV로 내보내기</button><span class="note" id="cmsg"></span></div>
-<h2 style="font-size:14px;margin-top:16px">가져오기</h2>
-<p class="note">내보낸 CSV를 그대로 쓰거나, 엑셀에서 수정한 CSV와 엑셀 파일(.xlsx)도 가져올 수 있습니다. 첫 줄에 날짜, 구분, 가격, 수량 열이 있어야 하고 구분은 매수, 예비금 매수, 매도 중 하나로 적습니다.</p>
-<div class="grid">
-<label>가져오는 방식<select id="imode"><option value="merge">기존 기록에 추가 (중복 제외)</option><option value="replace">기존 기록을 모두 교체</option></select></label>
-<label>파일 선택<input type="file" id="ifile" accept=".csv,.tsv,.txt,.xlsx,.xls"></label>
-</div>
-<label style="margin-top:10px">또는 엑셀에서 복사한 내용 붙여넣기<textarea id="itext" rows="3" style="width:100%;margin-top:3px;padding:7px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit"></textarea></label>
-<div class="row"><button id="ipaste">붙여넣은 내용 가져오기</button><span class="note" id="imsg"></span></div>
+<div class="scroll"><table><thead><tr><th>날짜</th><th>구분</th><th>가격</th><th>수량</th><th>금액</th><th>T(기록 후)</th><th>메모</th><th></th></tr></thead><tbody id="hist"></tbody></table></div>
+
 </section>
 
 <section class="card">
 <details><summary>계산 공식과 확인할 점</summary>
 <p class="note">1회 매수금 = 잔금 ÷ (분할 수 − T)<br>
-T = 분할 수 × (원금 − 잔금) ÷ 원금 (소수 둘째 자리 올림)<br>
+T는 체결 기록마다 갱신합니다: 매수 시 T += 매수금 ÷ 1회 매수금, 일부 매도 시 T × (남은 수량 ÷ 기존 수량), 전량 매도 시 0 (소수 둘째 자리 올림)<br>
 별% = 목표% − (목표% × 2 ÷ 분할 수) × T<br>
 전반전(T &lt; 분할 수 ÷ 2): 평단 LOC 0.5회 + 별가 LOC 0.5회 / 후반전: 별가 LOC 1회<br>
 매도: 수량의 1/4은 별가 LOC, 나머지 3/4은 평단 × (1 + 목표%) 지정가<br>
@@ -151,12 +159,11 @@ T = 분할 수 × (원금 − 잔금) ÷ 원금 (소수 둘째 자리 올림)<br
 이 공식은 널리 알려진 V2.1~V2.2 계열 해석을 구현한 것이며, 라오어 원문과 세부 규칙이 다를 수 있습니다. 실제 주문 전에 원문과 비교해 확인하세요. 투자 조언이 아니며 손익은 본인 책임입니다.</p></details>
 </section>
 </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const LS="tqqq-ib3-s",LE="tqqq-ib3-e";
 const DEF={total:10000,rp:20,N:40,tg:15,fb:12,dl:"",m01:true,re:true,pc:"",tov:"",d1:15,d2:25,d3:35,s1:25,s2:25};
-let S=Object.assign({},DEF),E=[],ORD=[],TIER=[],DB=null,UID=null,tm=null,armed=null;
+let S=Object.assign({},DEF),E=[],ORD=[],TIER=[],armed=null;
 try{const a=localStorage.getItem(LS),b=localStorage.getItem(LE);if(a)S=Object.assign(S,JSON.parse(a));if(b)E=JSON.parse(b)}catch(e){}
 const ids=["total","rp","N","tg","fb","dl","pc","tov","d1","d2","d3","s1","s2"];
 const num=v=>(v===""||v==null||isNaN(+v))?null:+v;
@@ -167,54 +174,112 @@ const kp=(l,v)=>`<div><b>${v}</b><span>${l}</span></div>`;
 const today=()=>new Date().toLocaleDateString("sv-SE");
 const SIDE={buy:"매수",reserve:"예비금 매수",sell:"매도"};
 function load(){ids.forEach(i=>$(i).value=S[i]);$("m01").checked=!!S.m01;$("re").checked=!!S.re}
-function setSync(t){$("sync").textContent=t}
+const LC="tqqq-gh-cfg";
+let GH={owner:"",repo:"",branch:"main",path:"data/tqqq-history.json",token:"",remember:true};
+let lastSha=null,dirty=false,force=false,armLoad=false,busy=false,lastMsg="",lastBad=false;
+try{GH=Object.assign(GH,JSON.parse(localStorage.getItem(LC)||"{}"))}catch(e){}
+function paint(t,bad){document.querySelectorAll(".gst").forEach(el=>{el.textContent=t;el.style.color=bad?"var(--buy)":""})}
+function setSync(t,bad){lastMsg=t;lastBad=!!bad;paint(t,bad)}
+function updStatus(){dirty?paint("저장되지 않은 변경이 있습니다. GitHub에 저장하세요.",false):paint(lastMsg,lastBad)}
 function save(){
   try{localStorage.setItem(LS,JSON.stringify(S));localStorage.setItem(LE,JSON.stringify(E))}catch(e){}
-  if(DB){clearTimeout(tm);tm=setTimeout(push,600)}
+  dirty=true;force=false;armLoad=false;updStatus();
 }
-async function push(){
-  try{const c=DB.collection("data/users/"+UID);await c.doc("settings").set({json:JSON.stringify(S)});await c.doc("history").set({json:JSON.stringify(E)});setSync("서버에 저장됨 (본인만 볼 수 있음)")}
-  catch(e){setSync("서버 저장 실패, 이 기기에만 저장됨")}
+function ghReady(){return !!(GH.owner&&GH.repo&&GH.token&&GH.path&&GH.branch)}
+function ghUrl(){return "https://api.github.com/repos/"+encodeURIComponent(GH.owner)+"/"+encodeURIComponent(GH.repo)+"/contents/"+GH.path.split("/").map(encodeURIComponent).join("/")}
+function ghFetch(method,body,qs){
+  const hd={"Accept":"application/vnd.github+json","Authorization":"Bearer "+GH.token,"X-GitHub-Api-Version":"2022-11-28"};
+  if(body)hd["Content-Type"]="application/json";
+  return fetch(ghUrl()+(qs||""),{method,cache:"no-store",headers:hd,body:body?JSON.stringify(body):undefined});
 }
-async function pull(){
-  const c=DB.collection("data/users/"+UID);
-  const [a,b]=await Promise.all([c.doc("settings").get(),c.doc("history").get()]);
-  if(a.exists||b.exists){
-    if(a.exists)S=Object.assign({},DEF,JSON.parse(a.data().json));
-    if(b.exists)E=JSON.parse(b.data().json);
-    load();render();setSync("서버와 동기화됨 (본인만 볼 수 있음)");
-  }else{await push()}
+function errMsg(r){
+  if(r.status===401)return "토큰이 올바르지 않거나 만료되었습니다.";
+  if(r.status===403)return "권한이 없거나 요청 한도를 넘었습니다. 토큰의 Contents 권한을 확인하세요.";
+  if(r.status===404)return "저장소, 브랜치 또는 경로를 찾을 수 없습니다. 이름과 토큰의 저장소 접근 권한을 확인하세요.";
+  if(r.status===409||r.status===422)return "다른 곳에서 먼저 저장되어 충돌했습니다. 불러오기를 먼저 하세요.";
+  return "GitHub 오류 ("+r.status+")";
 }
+function b64enc(s){const by=new TextEncoder().encode(s);let b="";by.forEach(c=>b+=String.fromCharCode(c));return btoa(b)}
+function b64dec(s){const b=atob(s.replace(/\s/g,""));const by=new Uint8Array(b.length);for(let i=0;i<b.length;i++)by[i]=b.charCodeAt(i);return new TextDecoder().decode(by)}
+function needCfg(){setSync("먼저 GitHub 연결 설정(소유자, 저장소, 토큰)을 입력하세요.",true);$("ghcfg").open=true}
+async function ghLoad(){
+  if(busy)return;
+  if(!ghReady()){needCfg();return}
+  if(dirty&&!armLoad){armLoad=true;paint("저장하지 않은 변경이 있습니다. 불러오면 사라집니다. 계속하려면 불러오기를 한 번 더 누르세요.",true);return}
+  armLoad=false;busy=true;setSync("불러오는 중...");
+  try{
+    const r=await ghFetch("GET",null,"?ref="+encodeURIComponent(GH.branch));
+    if(r.status===404){setSync("저장된 이력 파일이 없거나 저장소를 찾을 수 없습니다. 처음이라면 먼저 저장하세요.",true);return}
+    if(!r.ok){setSync(errMsg(r),true);return}
+    const j=await r.json(),data=JSON.parse(b64dec(j.content));
+    S=Object.assign({},DEF,data.settings||{});E=Array.isArray(data.entries)?data.entries:[];
+    lastSha=j.sha;dirty=false;force=false;
+    try{localStorage.setItem(LS,JSON.stringify(S));localStorage.setItem(LE,JSON.stringify(E))}catch(e){}
+    load();render();setSync("GitHub에서 불러옴 · "+E.length+"건 ("+new Date().toLocaleString("ko-KR")+")");
+  }catch(e){setSync("불러오지 못했습니다: "+(e.message||"네트워크 오류"),true)}
+  finally{busy=false}
+}
+async function ghSave(){
+  if(busy)return;
+  if(!ghReady()){needCfg();return}
+  busy=true;setSync("저장 중...");
+  try{
+    const g=await ghFetch("GET",null,"?ref="+encodeURIComponent(GH.branch));
+    let sha=null;
+    if(g.status===200){
+      sha=(await g.json()).sha;
+      if(sha!==lastSha&&!force){
+        force=true;
+        setSync((lastSha?"다른 기기에서 저장된 변경이 있습니다.":"GitHub에 이미 저장된 이력이 있습니다.")+" 먼저 불러오기를 하거나, 덮어쓰려면 저장을 한 번 더 누르세요.",true);return;
+      }
+    }else if(g.status!==404){setSync(errMsg(g),true);return}
+    const now=new Date().toISOString();
+    const body={message:"무한매수 이력 저장 "+now,content:b64enc(JSON.stringify({v:1,savedAt:now,settings:S,entries:E},null,1)),branch:GH.branch};
+    if(sha)body.sha=sha;
+    const p=await ghFetch("PUT",body);
+    if(!p.ok){setSync(errMsg(p),true);return}
+    const j=await p.json();lastSha=j.content.sha;dirty=false;force=false;
+    setSync("GitHub에 저장됨 · "+E.length+"건 ("+new Date().toLocaleString("ko-KR")+")");
+  }catch(e){setSync("저장하지 못했습니다: "+(e.message||"네트워크 오류"),true)}
+  finally{busy=false}
+}
+function hasT(e){return e.t!==undefined&&e.t!==null&&e.t!==""&&!isNaN(+e.t)}
 function derive(){
-  const rate=(+S.rp||0)/100;
+  const N=+S.N||40,rate=(+S.rp||0)/100;
   let total=+S.total||0,capC=total*(1-rate),resC=total*rate;
-  let cash=capC,qty=0,cost=0,resUsed=0,tiers={},cyc=1,start=null,cp=0,cc=0,cycles=[],pnlAll=0;
+  let cash=capC,qty=0,cost=0,resUsed=0,tiers={},cyc=1,start=null,cp=0,cc=0,cycles=[],pnlAll=0,T=0;const Ta={};
   const arr=E.slice().sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.ts-b.ts);
   for(const e of arr){
     const v=e.p*e.q;
     if(e.side==="sell"){
-      const q=Math.min(e.q,qty);if(q<=0)continue;
+      const q=Math.min(e.q,qty);if(q<=0){Ta[e.ts]=T;continue}
+      const before=qty;
       cost-=cost*q/qty;const pr=e.p*q;cash+=pr;cp+=pr;qty-=q;
       if(qty<=0){
         const pnl=cp-cc;pnlAll+=pnl;cycles.push({n:cyc,s:start,e:e.d,cc,cp,pnl});
         total=cash+(resC-resUsed);
         if(S.re){capC=total*(1-rate);resC=total*rate}
-        cash=capC;cost=0;qty=0;resUsed=0;tiers={};cyc++;start=null;cp=0;cc=0;
-      }
+        cash=capC;cost=0;qty=0;resUsed=0;tiers={};cyc++;start=null;cp=0;cc=0;T=0;
+      }else T=hasT(e)?+e.t:ce(T*qty/before);
     }else{
-      if(!start)start=e.d;qty+=e.q;cost+=v;cc+=v;
-      if(e.side==="reserve"){resUsed+=v;tiers[e.tier]=1}else cash-=v;
+      if(!start)start=e.d;
+      if(e.side==="reserve"){resUsed+=v;tiers[e.tier]=1;if(hasT(e))T=+e.t}
+      else{
+        const unit=(cash>0&&N-T>0)?cash/(N-T):capC/N;
+        cash-=v;T=hasT(e)?+e.t:ce(T+v/unit);
+      }
+      qty+=e.q;cost+=v;cc+=v;
     }
+    Ta[e.ts]=T;
   }
-  return {capC,resC,cash,qty,avg:qty>0?cost/qty:0,resLeft:resC-resUsed,tiers,cyc,start,cycles,pnlAll,total};
+  return {capC,resC,cash,qty,avg:qty>0?cost/qty:0,resLeft:resC-resUsed,tiers,cyc,start,cycles,pnlAll,total,T,Ta};
 }
 function render(){
   const N=+S.N||40,tg=+S.tg||0,fb=+S.fb||0,pc=num(S.pc);
   const D=derive(),{capC,resC,cash,qty,avg,resLeft}=D;
   const days=!S.dl?"미설정":(()=>{const d=Math.ceil((new Date(S.dl+"T23:59:59")-new Date())/864e5);return d>=0?d+"일":"시한 경과"})();
-  $("posKpi").innerHTML=kp("사이클",D.cyc+"회차")+kp("보유 수량",qty+"주")+kp("평단가",qty>0?usd(avg):"-")+kp("사이클 잔금",usd(cash))+kp("예비금 잔액",usd(resLeft))+kp("종료까지",days);
-  const tAuto=capC>0?ce(Math.max(0,N*(capC-cash)/capC)):0;
-  const T=num(S.tov)!=null?num(S.tov):tAuto;
+  $("posKpi").innerHTML=kp("사이클",D.cyc+"회차")+kp("현재 T",D.T.toFixed(2))+kp("보유 수량",qty+"주")+kp("평단가",qty>0?usd(avg):"-")+kp("사이클 잔금",usd(cash))+kp("예비금 잔액",usd(resLeft))+kp("종료까지",days);
+  const T=num(S.tov)!=null?num(S.tov):D.T;
   const ex=T>N-1;
   const unit=(ex||cash<=0)?0:cash/(N-T);
   const star=tg-(tg*2/N)*T,front=T<N/2,sub=S.m01?0.01:0;
@@ -259,11 +324,11 @@ function render(){
   $("hKpi").innerHTML=kp("누적 실현손익",`<span class="${D.pnlAll>=0?"pos":"neg"}" style="font-size:17px;color:inherit">${usd(D.pnlAll)}</span>`)+kp("완료 사이클",D.cycles.length+"회")+kp("승/패",wins+" / "+(D.cycles.length-wins))+kp("체결 기록",E.length+"건");
   $("cycles").innerHTML=D.cycles.length?D.cycles.map(c=>`<tr><td data-l="사이클">${c.n}회차</td><td data-l="기간">${c.s||"-"} ~ ${c.e}</td><td data-l="매수 합계">${usd(c.cc)}</td><td data-l="매도 합계">${usd(c.cp)}</td><td data-l="손익" class="${c.pnl>=0?"pos":"neg"}">${usd(c.pnl)}</td><td data-l="수익률" class="${c.pnl>=0?"pos":"neg"}">${c.cc>0?(c.pnl/c.cc*100).toFixed(2)+"%":"-"}</td></tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--mut)">완료된 사이클이 없습니다.</td></tr>`;
   const arr=E.slice().sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:b.ts-a.ts);
-  $("hist").innerHTML=arr.length?arr.map(e=>`<tr><td data-l="날짜">${esc(e.d)}</td><td data-l="구분" class="${e.side==="sell"?"sell":"buy"}">${SIDE[e.side]}${e.side==="reserve"?" "+e.tier+"단계":""}</td><td data-l="가격">${usd(e.p)}</td><td data-l="수량">${e.q}주</td><td data-l="금액">${usd(e.p*e.q)}</td><td data-l="메모" class="w" style="text-align:left">${esc(e.memo)||"-"}</td><td class="w"><button class="mini" data-del="${e.ts}">${armed===e.ts?"정말 삭제":"삭제"}</button></td></tr>`).join(""):`<tr><td colspan="7" style="text-align:center;color:var(--mut)">아직 체결 기록이 없습니다.</td></tr>`;
+  $("hist").innerHTML=arr.length?arr.map(e=>`<tr><td data-l="날짜">${esc(e.d)}</td><td data-l="구분" class="${e.side==="sell"?"sell":"buy"}">${SIDE[e.side]}${e.side==="reserve"?" "+e.tier+"단계":""}</td><td data-l="가격">${usd(e.p)}</td><td data-l="수량">${e.q}주</td><td data-l="금액">${usd(e.p*e.q)}</td><td data-l="기록 후 T">${(D.Ta[e.ts]||0).toFixed(2)}${hasT(e)?" (직접)":""}</td><td data-l="메모" class="w" style="text-align:left">${esc(e.memo)||"-"}</td><td class="w"><button class="mini" data-del="${e.ts}">${armed===e.ts?"정말 삭제":"삭제"}</button></td></tr>`).join(""):`<tr><td colspan="7" style="text-align:center;color:var(--mut)">아직 체결 기록이 없습니다.</td></tr>`;
 }
 function fill(side,p,q,tier,memo){
   $("fd").value=today();$("fs").value=side;$("ft").value=tier||1;$("ftw").style.display=side==="reserve"?"":"none";
-  $("fp").value=p;$("fq").value=q;$("fm").value=memo||"";$("fmsg").textContent="";
+  $("fp").value=p;$("fq").value=q;$("fm").value=memo||"";$("ftv").value="";$("fmsg").textContent="";updatePrev();
   $("fform").scrollIntoView({behavior:"smooth"});
 }
 document.addEventListener("click",ev=>{
@@ -280,106 +345,37 @@ $("fs").addEventListener("change",()=>{$("ftw").style.display=$("fs").value==="r
 $("add").addEventListener("click",()=>{
   const d=$("fd").value,side=$("fs").value,p=num($("fp").value),q=Math.floor(num($("fq").value)||0);
   if(!d||!(p>0)||q<1){$("fmsg").textContent="날짜, 가격, 수량(1주 이상)을 확인하세요.";return}
-  E.push({ts:Date.now(),d,side,p,q,tier:side==="reserve"?+$("ft").value:0,memo:$("fm").value.trim()});
-  $("fp").value="";$("fq").value="";$("fm").value="";$("fmsg").textContent="기록을 추가했습니다.";
+  const tv=num($("ftv").value);
+  E.push({ts:Date.now(),d,side,p,q,tier:side==="reserve"?+$("ft").value:0,memo:$("fm").value.trim(),t:tv==null?undefined:tv});
+  $("fp").value="";$("fq").value="";$("fm").value="";$("ftv").value="";$("fmsg").textContent="기록을 추가했습니다.";
   save();render();
 });
-$("csv").addEventListener("click",async()=>{
-  const rows=[["날짜","구분","가격","수량","금액","예비금 단계","메모"]].concat(E.slice().sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.ts-b.ts).map(e=>[e.d,SIDE[e.side],e.p,e.q,(e.p*e.q).toFixed(2),e.tier||"",'"'+String(e.memo||"").replace(/"/g,'""')+'"']));
-  const text="\ufeff"+rows.map(r=>r.join(",")).join("\n");
-  try{
-    const dl=window.claude&&await claude.use("downloads");
-    if(!dl){$("cmsg").textContent="이 환경에서는 내보내기를 사용할 수 없습니다.";return}
-    await dl.save({filename:"tqqq-history.csv",data:text});$("cmsg").textContent="저장했습니다.";
-  }catch(e){$("cmsg").textContent="저장하지 않았습니다.";}
-});
-function parseCSV(t){
-  t=t.replace(/^\ufeff/,"");
-  const first=t.split("\n")[0]||"";
-  const dl=(first.match(/\t/g)||[]).length>(first.match(/,/g)||[]).length?"\t":",";
-  const rows=[];let r=[],c="",q=false;
-  for(let i=0;i<t.length;i++){
-    const ch=t[i];
-    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
-    else if(ch==='"')q=true;
-    else if(ch===dl){r.push(c);c=""}
-    else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&t[i+1]==="\n")i++;r.push(c);rows.push(r);r=[];c=""}
-    else c+=ch;
-  }
-  if(c!==""||r.length){r.push(c);rows.push(r)}
-  return rows.filter(x=>x.some(v=>String(v).trim()!==""));
+function updatePrev(){
+  const el=$("tprev");if(!el)return;
+  const d=$("fd").value||today(),side=$("fs").value,p=num($("fp").value),q=Math.floor(num($("fq").value)||0);
+  if(!(p>0)||q<1){el.textContent="";return}
+  const tv=num($("ftv").value),cur=derive(),tmp={ts:Number.MAX_SAFE_INTEGER,d,side,p,q,tier:+$("ft").value,memo:"",t:tv==null?undefined:tv};
+  const bk=E;E=E.concat([tmp]);const nx=derive();E=bk;
+  const end=nx.cycles.length>cur.cycles.length;
+  el.textContent=`현재 T ${cur.T.toFixed(2)} → 기록 후 T ${(nx.Ta[tmp.ts]||0).toFixed(2)}${tv!=null&&!end?" (직접 입력)":""}${end?" · 전량 매도로 사이클 종료":""}`;
 }
-function normDate(v){
-  v=String(v).trim();
-  let m=v.match(/^(\d{4})[-\/.]\s*(\d{1,2})[-\/.]\s*(\d{1,2})/);
-  if(m)return m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
-  m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(m)return m[3]+"-"+m[1].padStart(2,"0")+"-"+m[2].padStart(2,"0");
-  if(/^\d{5}$/.test(v))return new Date(Math.round((+v-25569)*864e5)).toISOString().slice(0,10);
-  return "";
-}
-function toEntries(rows){
-  const h=rows[0].map(x=>String(x).trim()),col=n=>h.indexOf(n);
-  const ci={d:col("날짜"),s:col("구분"),p:col("가격"),q:col("수량"),t:col("예비금 단계"),m:col("메모")};
-  if(ci.d<0||ci.s<0||ci.p<0||ci.q<0)throw new Error("첫 줄에서 날짜, 구분, 가격, 수량 열을 찾지 못했습니다.");
-  const out=[],bad=[];const base=Date.now();
-  rows.slice(1).forEach((r,i)=>{
-    const d=normDate(r[ci.d]),s=String(r[ci.s]||"").trim();
-    const p=parseFloat(String(r[ci.p]).replace(/[$,\s]/g,"")),q=Math.floor(parseFloat(String(r[ci.q]).replace(/[,\s주]/g,"")));
-    const side=s.includes("예비")?"reserve":s.includes("매도")?"sell":s.includes("매수")?"buy":"";
-    if(!d||!side||!(p>0)||!(q>0)){bad.push(i+2);return}
-    let tier=0;
-    if(side==="reserve"){tier=parseInt(ci.t>=0?r[ci.t]:"")||parseInt((s.match(/\d/)||[])[0])||1;if(tier<1||tier>3)tier=1}
-    out.push({ts:base+i,d,side,p,q,tier,memo:ci.m>=0?String(r[ci.m]||"").trim():""});
-  });
-  return {out,bad};
-}
-function importText(text){
-  const m=$("imsg");
-  try{
-    const rows=parseCSV(text);
-    if(rows.length<2){m.textContent="가져올 데이터가 없습니다.";return}
-    const {out,bad}=toEntries(rows);
-    if(!out.length){m.textContent="읽을 수 있는 행이 없습니다. 형식을 확인하세요.";return}
-    let added=0,skipped=0;
-    if($("imode").value==="replace"){E=out;added=out.length}
-    else{
-      const cnt={},key=e=>[e.d,e.side,e.p,e.q,e.tier].join("|");
-      E.forEach(e=>{cnt[key(e)]=(cnt[key(e)]||0)+1});
-      out.forEach(e=>{const k=key(e);if(cnt[k]>0){cnt[k]--;skipped++}else{E.push(e);added++}});
-    }
-    save();render();
-    m.textContent=`${added}건 추가${skipped?`, 중복 ${skipped}건 제외`:""}${bad.length?`, 형식 오류로 건너뜀: ${bad.slice(0,5).join(", ")}행${bad.length>5?" 외":""}`:""}`;
-  }catch(e){m.textContent=e.message||"가져오지 못했습니다."}
-}
-async function readFileText(f){
-  if(/\.xlsx?$/i.test(f.name)){
-    if(!window.XLSX)throw new Error("엑셀 파일 읽기 도구를 불러오지 못했습니다. CSV로 저장해서 가져오세요.");
-    const wb=XLSX.read(await f.arrayBuffer(),{type:"array",cellDates:false});
-    return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]],{dateNF:"yyyy-mm-dd"});
-  }
-  const buf=await f.arrayBuffer();
-  try{return new TextDecoder("utf-8",{fatal:true}).decode(buf)}
-  catch(e){return new TextDecoder("euc-kr").decode(buf)}
-}
-$("ifile").addEventListener("change",async()=>{
-  const f=$("ifile").files[0];if(!f)return;
-  try{importText(await readFileText(f))}catch(e){$("imsg").textContent=e.message||"파일을 읽지 못했습니다."}
-  $("ifile").value="";
-});
-$("ipaste").addEventListener("click",()=>{importText($("itext").value);$("itext").value=""});
+const _render=render;render=function(){_render();updatePrev()};
+["fd","fs","ft","fp","fq","ftv"].forEach(i=>{$(i).addEventListener("input",updatePrev);$(i).addEventListener("change",updatePrev)});
 ids.forEach(i=>$(i).addEventListener("input",()=>{S[i]=$(i).value;save();render()}));
 ["m01","re"].forEach(i=>$(i).addEventListener("change",()=>{S[i]=$(i).checked;save();render()}));
 $("fd").value=today();
 load();render();
-(async()=>{
-  try{
-    if(!window.claude)return;
-    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
-    if(!db||!user)return;
-    UID=await user.id();if(!UID)return;DB=db;
-    await pull();
-  }catch(e){DB=null;setSync("서버 연결 실패, 이 기기에만 저장 중")}
+(function initGH(){
+  if(!GH.owner&&/\.github\.io$/.test(location.hostname))GH.owner=location.hostname.split(".")[0];
+  $("ghOwner").value=GH.owner;$("ghRepo").value=GH.repo;$("ghBranch").value=GH.branch;$("ghPath").value=GH.path;$("ghToken").value=GH.token;$("ghRem").checked=GH.remember!==false;
+  const map={ghOwner:"owner",ghRepo:"repo",ghBranch:"branch",ghPath:"path",ghToken:"token"};
+  function persist(){const c=Object.assign({},GH);if(!GH.remember)c.token="";try{localStorage.setItem(LC,JSON.stringify(c))}catch(e){}}
+  Object.keys(map).forEach(id=>$(id).addEventListener("input",()=>{GH[map[id]]=$(id).value.trim();lastSha=null;force=false;persist()}));
+  $("ghRem").addEventListener("change",()=>{GH.remember=$("ghRem").checked;persist()});
+  document.querySelectorAll(".ghsave").forEach(b=>b.addEventListener("click",ghSave));
+  document.querySelectorAll(".ghload").forEach(b=>b.addEventListener("click",ghLoad));
+  window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+  setSync(!ghReady()?"GitHub 연결 설정을 먼저 입력하세요.":E.length?"이 기기의 임시 저장본을 표시 중입니다. 최신 이력은 GitHub에서 불러오세요.":"연결 설정이 되어 있습니다. 불러오기 또는 저장을 누르세요.");
 })();
 </script>
 </body>
