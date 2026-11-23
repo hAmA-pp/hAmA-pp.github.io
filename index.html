@@ -35,6 +35,13 @@ button.mini{padding:3px 8px;font-size:12px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
 details{margin-top:6px}summary{cursor:pointer;font-size:13px;color:var(--ac)}
 html{-webkit-text-size-adjust:100%}
+section.card.fold>h2:first-child{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;user-select:none;-webkit-tap-highlight-color:transparent}
+section.card.fold>h2:first-child::after{content:"▾";color:var(--mut);font-size:15px;transition:transform .15s}
+section.card.fold.closed>h2:first-child{margin-bottom:0}
+section.card.fold.closed>h2:first-child::after{transform:rotate(-90deg)}
+section.card.fold.closed>:not(:first-child){display:none}
+section.card.fold>h2:first-child:focus-visible{outline:2px solid var(--ac);outline-offset:3px;border-radius:6px}
+nav a.sm{color:var(--mut)}
 nav{display:flex;gap:8px;overflow-x:auto;margin:8px 0 12px}
 nav a{flex:none;padding:7px 14px;border:1px solid var(--bd);border-radius:999px;background:var(--card);color:var(--ac);font-size:13px;text-decoration:none}
 @media (max-width:640px){
@@ -73,7 +80,7 @@ td button{width:100%}
 </div>
 <p class="note">이력은 위 저장소의 지정한 파일(JSON)에 커밋으로 저장됩니다. 공개 저장소에 저장하면 이력이 누구에게나 보이므로, 이력 전용 비공개(private) 저장소를 따로 만드는 것을 권장합니다. 토큰은 GitHub의 Settings → Developer settings → Fine-grained tokens에서 그 저장소 하나만 선택하고 Contents 권한을 Read and write로 발급하세요. 토큰은 이 기기 브라우저에만 저장되고 저장소에는 올라가지 않습니다. 공용 기기에서는 “이 기기에 토큰 저장”을 끄세요.</p>
 </details></div>
-<nav><a href="#s-order">오늘 주문</a><a href="#fform">체결 기록</a><a href="#s-hist">이력</a><a href="#s-cfg">설정</a></nav>
+<nav><a href="#s-order">오늘 주문</a><a href="#fform">체결 기록</a><a href="#s-hist">이력</a><a href="#s-cfg">설정</a><a href="#" id="foldAll" class="sm">모두 접기</a><a href="#" id="unfoldAll" class="sm">모두 펼치기</a></nav>
 
 <section class="card" id="s-cfg">
 <h2>1. 전략 설정</h2>
@@ -327,6 +334,7 @@ function render(){
   $("hist").innerHTML=arr.length?arr.map(e=>`<tr><td data-l="날짜">${esc(e.d)}</td><td data-l="구분" class="${e.side==="sell"?"sell":"buy"}">${SIDE[e.side]}${e.side==="reserve"?" "+e.tier+"단계":""}</td><td data-l="가격">${usd(e.p)}</td><td data-l="수량">${e.q}주</td><td data-l="금액">${usd(e.p*e.q)}</td><td data-l="기록 후 T">${(D.Ta[e.ts]||0).toFixed(2)}${hasT(e)?" (직접)":""}</td><td data-l="메모" class="w" style="text-align:left">${esc(e.memo)||"-"}</td><td class="w"><button class="mini" data-del="${e.ts}">${armed===e.ts?"정말 삭제":"삭제"}</button></td></tr>`).join(""):`<tr><td colspan="7" style="text-align:center;color:var(--mut)">아직 체결 기록이 없습니다.</td></tr>`;
 }
 function fill(side,p,q,tier,memo){
+  unfold($("fform"));
   $("fd").value=today();$("fs").value=side;$("ft").value=tier||1;$("ftw").style.display=side==="reserve"?"":"none";
   $("fp").value=p;$("fq").value=q;$("fm").value=memo||"";$("ftv").value="";$("fmsg").textContent="";updatePrev();
   $("fform").scrollIntoView({behavior:"smooth"});
@@ -365,6 +373,27 @@ ids.forEach(i=>$(i).addEventListener("input",()=>{S[i]=$(i).value;save();render(
 ["m01","re"].forEach(i=>$(i).addEventListener("change",()=>{S[i]=$(i).checked;save();render()}));
 $("fd").value=today();
 load();render();
+const LF="tqqq-fold";
+let FOLD={};try{FOLD=JSON.parse(localStorage.getItem(LF)||"{}")}catch(e){}
+function secKey(s){return s.firstElementChild.textContent.trim()}
+function setFold(s,closed){
+  s.classList.toggle("closed",closed);s.firstElementChild.setAttribute("aria-expanded",String(!closed));
+  FOLD[secKey(s)]=closed;try{localStorage.setItem(LF,JSON.stringify(FOLD))}catch(e){}
+}
+function unfold(s){if(s&&s.classList.contains("closed"))setFold(s,false)}
+(function initFold(){
+  const secs=[...document.querySelectorAll("main>section.card")].filter(s=>s.firstElementChild&&s.firstElementChild.tagName==="H2");
+  secs.forEach(s=>{
+    const hd=s.firstElementChild,closed=!!FOLD[secKey(s)];
+    s.classList.add("fold");s.classList.toggle("closed",closed);
+    hd.setAttribute("role","button");hd.tabIndex=0;hd.setAttribute("aria-expanded",String(!closed));
+    hd.addEventListener("click",()=>setFold(s,!s.classList.contains("closed")));
+    hd.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();hd.click()}});
+  });
+  $("foldAll").addEventListener("click",e=>{e.preventDefault();secs.forEach(s=>setFold(s,true))});
+  $("unfoldAll").addEventListener("click",e=>{e.preventDefault();secs.forEach(s=>setFold(s,false))});
+  document.querySelectorAll("nav a").forEach(a=>{const t=a.getAttribute("href");if(t&&t.length>1)a.addEventListener("click",()=>unfold(document.querySelector(t)))});
+})();
 (function initGH(){
   if(!GH.owner&&/\.github\.io$/.test(location.hostname))GH.owner=location.hostname.split(".")[0];
   $("ghOwner").value=GH.owner;$("ghRepo").value=GH.repo;$("ghBranch").value=GH.branch;$("ghPath").value=GH.path;$("ghToken").value=GH.token;$("ghRem").checked=GH.remember!==false;
