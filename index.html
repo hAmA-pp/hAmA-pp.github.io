@@ -454,7 +454,7 @@ async function tsSend(orders,out){
   tsArm=null;tsBusy=true;out("전송 중...");
   try{
     const j=await tsFetch("/orders",{method:"POST",body:{orders}});
-    const lines=j.results.map(r=>{const o=orders.find(x=>x.key===r.key);return (r.ok?(r.dryRun?"모의 ✓ ":"접수 ✓ "):r.already?"건너뜀 · ":"실패 ✗ ")+(o?tsLabel(o):r.key)+(r.ok?"":" — "+r.error)});
+    const lines=j.results.map(r=>{const o=orders.find(x=>x.key===r.key);return (r.ok?(r.dryRun?"모의 ✓ ":r.resent?"재주문 ✓ ":"접수 ✓ "):r.already?"건너뜀 · ":"실패 ✗ ")+(o?tsLabel(o):r.key)+(r.ok?"":" — "+r.error)});
     out((j.live?"토스 주문 결과":"[모의 실행] 중계 서버가 live:false라 실제 주문은 나가지 않았습니다")+"\n"+lines.join("\n"),j.results.some(r=>!r.ok&&!r.already));
   }catch(e){out("전송하지 못했습니다: "+e.message,true)}
   finally{tsBusy=false}
@@ -483,7 +483,7 @@ async function tsSync(auto){
     const from=first?new Date(Date.parse(first+"T00:00:00Z")-7*864e5).toISOString().slice(0,10):new Date(Date.now()-365*864e5).toISOString().slice(0,10);
     const j=await tsFetch("/fills?from="+encodeURIComponent(from));
     const fills=(j.fills||[]).map(f=>{
-      const m=/-r([123])$/.exec(f.clientOrderId||"");
+      const m=/-r([123])(?:-\d+)?$/.exec(f.clientOrderId||"");
       return Object.assign({},f,{q:Math.floor(+f.quantity),p:+f.price,d:usDay(f.filledAt||f.orderedAt)||today(),side2:f.side==="SELL"?"sell":m?"reserve":"buy",tier:m?+m[1]:0});
     }).filter(f=>f.q>=1&&f.p>0).sort((a,b)=>String(a.filledAt||a.orderedAt).localeCompare(String(b.filledAt||b.orderedAt)));
     const byOid=new Map(fills.map(f=>[f.orderId,f]));
