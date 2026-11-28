@@ -1,544 +1,119 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>TQQQ 무한매수법 주문 계산기</title>
+<title>hAmA</title>
+<meta name="description" content="hAmA의 작은 작업실">
+<script>try{var t=localStorage.getItem("hama-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5f6f8;--card:#fff;--tx:#1b1f24;--mut:#667085;--bd:#dfe3e8;--ac:#2563eb;--buy:#c2410c;--sell:#15803d;--wb:#fef3c7;--wt:#92400e;--ok:#dcfce7;--okt:#166534;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1419;--card:#1a2028;--tx:#e6e9ee;--mut:#98a2b3;--bd:#2d3540;--ac:#6ea0ff;--buy:#fb923c;--sell:#4ade80;--wb:#3a2e0e;--wt:#fcd34d;--ok:#12301d;--okt:#86efac;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1419;--card:#1a2028;--tx:#e6e9ee;--mut:#98a2b3;--bd:#2d3540;--ac:#6ea0ff;--buy:#fb923c;--sell:#4ade80;--wb:#3a2e0e;--wt:#fcd34d;--ok:#12301d;--okt:#86efac;color-scheme:dark}
+:root{
+  --bg:#faf9f6;--surface:#f2f0eb;--tx:#22211f;--mut:#75726b;--faint:#a5a29a;--line:#e5e2db;--ac:#b4532a;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151514;--surface:#1e1e1c;--tx:#e9e7e2;--mut:#9c998f;--faint:#6b6962;--line:#2c2b28;--ac:#e08a5f;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#151514;--surface:#1e1e1c;--tx:#e9e7e2;--mut:#9c998f;--faint:#6b6962;--line:#2c2b28;--ac:#e08a5f;
+  color-scheme:dark;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 -apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
-main{max-width:900px;margin:0 auto;padding:16px}
-h1{font-size:20px;margin:4px 0 4px}h2{font-size:16px;margin:0 0 10px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-label{display:block;font-size:12px;color:var(--mut)}
-input[type=number],input[type=date],input[type=text],input[type=password],select{width:100%;margin-top:3px;padding:7px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
-.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tx)}
-.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:10px}
-.kpi div{background:var(--bg);border-radius:8px;padding:8px}
-.kpi b{display:block;font-size:17px}.kpi span{font-size:11px;color:var(--mut)}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{padding:8px 6px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-th{font-size:12px;color:var(--mut);font-weight:600}
-.buy{color:var(--buy);font-weight:600}.sell{color:var(--sell);font-weight:600}.pos{color:var(--sell)}.neg{color:var(--buy)}
-.msg{padding:9px 11px;border-radius:8px;margin:8px 0;font-size:13px;background:var(--wb);color:var(--wt)}
-.note{font-size:12px;color:var(--mut)}
-button{font:inherit;font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
-button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
-button.mini{padding:3px 8px;font-size:12px}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
-details{margin-top:6px}summary{cursor:pointer;font-size:13px;color:var(--ac)}
 html{-webkit-text-size-adjust:100%}
-section.card.fold>h2:first-child{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;user-select:none;-webkit-tap-highlight-color:transparent}
-section.card.fold>h2:first-child::after{content:"▾";color:var(--mut);font-size:15px;transition:transform .15s}
-section.card.fold.closed>h2:first-child{margin-bottom:0}
-section.card.fold.closed>h2:first-child::after{transform:rotate(-90deg)}
-section.card.fold.closed>:not(:first-child){display:none}
-section.card.fold>h2:first-child:focus-visible{outline:2px solid var(--ac);outline-offset:3px;border-radius:6px}
-nav a.sm{color:var(--mut)}
-nav{display:flex;gap:8px;overflow-x:auto;margin:8px 0 12px}
-nav a{flex:none;padding:7px 14px;border:1px solid var(--bd);border-radius:999px;background:var(--card);color:var(--ac);font-size:13px;text-decoration:none}
-@media (max-width:640px){
-main{display:flex;flex-direction:column;padding:12px 12px 32px}
-h1{order:-3;font-size:18px}#gh{order:-2}nav{order:-1}
-main>section:nth-of-type(2){order:1}main>section:nth-of-type(3){order:2}main>section:nth-of-type(5){order:3}main>section:nth-of-type(4){order:4}main>section:nth-of-type(6){order:5}main>section:nth-of-type(1){order:6}main>section:nth-of-type(7){order:7}
-.card{padding:12px;margin-bottom:12px;scroll-margin-top:8px}
-input[type=number],input[type=date],input[type=text],input[type=password],select{font-size:16px;min-height:44px}
-button{min-height:44px;font-size:14px}
-.kpi b{font-size:16px}
-table,thead,tbody,tr,td{display:block}
-thead{display:none}
-tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-bottom:8px}
-td,td:first-child{border:0;padding:2px 0;text-align:left;white-space:normal}
-td::before{content:attr(data-l);display:block;font-size:11px;color:var(--mut)}
-td.w,td[colspan]{grid-column:1/-1}
-td button{width:100%}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.7 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  transition:background-color .2s,color .2s}
+.wrap{max-width:640px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 20px max(40px,env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:64px}
+.logo{font-family:"Noto Serif KR",serif;font-weight:700;font-size:20px;color:var(--tx);text-decoration:none;letter-spacing:-.01em}
+.logo span{color:var(--ac)}
+.theme{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);cursor:pointer;transition:color .15s,border-color .15s}
+.theme:hover{color:var(--tx);border-color:var(--faint)}
+.theme svg{width:18px;height:18px}
+.theme .sun{display:none}
+:root[data-theme="dark"] .theme .sun{display:block}:root[data-theme="dark"] .theme .moon{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme .sun{display:block}:root:not([data-theme="light"]) .theme .moon{display:none}}
+.intro h1{font-family:"Noto Serif KR",serif;font-weight:700;font-size:30px;line-height:1.35;letter-spacing:-.02em;margin:0 0 12px}
+.intro p{margin:0;color:var(--mut)}
+h2{font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--faint);margin:64px 0 8px}
+.list{list-style:none;margin:0;padding:0}
+.list li{border-top:1px solid var(--line)}
+.list li:last-child{border-bottom:1px solid var(--line)}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center;padding:22px 4px;color:inherit;text-decoration:none}
+.meta{grid-column:1/-1;font-size:13px;color:var(--faint);display:flex;gap:8px;align-items:center}
+.meta .tag{color:var(--ac);font-weight:600}
+.title{font-family:"Noto Serif KR",serif;font-size:21px;font-weight:700;letter-spacing:-.01em;line-height:1.4}
+.desc{grid-column:1;font-size:15px;color:var(--mut)}
+.arrow{grid-column:2;grid-row:2/4;color:var(--faint);font-size:20px;transition:transform .18s,color .18s}
+a.item:hover .title{color:var(--ac)}
+a.item:hover .arrow{transform:translateX(4px);color:var(--ac)}
+a.item:focus-visible{outline:2px solid var(--ac);outline-offset:2px;border-radius:6px}
+.item.soon{cursor:default}
+.item.soon .title,.item.soon .desc{color:var(--faint)}
+.badge{font-size:12px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;color:var(--mut);background:var(--surface)}
+footer{margin-top:72px;font-size:13px;color:var(--faint)}
+@media (max-width:480px){
+  header{margin-bottom:48px}
+  .intro h1{font-size:25px}
+  .title{font-size:19px}
+  h2{margin-top:48px}
 }
 </style>
 </head>
 <body>
-<main>
-<h1>TQQQ 무한매수법 주문 계산기</h1>
-<div class="card" id="gh">
-<h2>주문 전송 · 이력 저장</h2>
-<div class="row" style="margin-top:0"><button class="pri" id="tsSend">토스로 오늘 주문 전송</button><button class="ghsave">저장</button><button class="ghload">불러오기</button></div>
-<p class="note" id="tsRes" style="white-space:pre-line;margin:8px 0 0"></p>
-<p class="note gst" id="sync" style="margin:8px 0 0"></p>
-<details id="ghcfg"><summary>GitHub 연결 설정</summary>
-<div class="grid" style="margin-top:8px">
-<label>소유자 (사용자명)<input type="text" id="ghOwner" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-<label>저장소 이름<input type="text" id="ghRepo" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-<label>브랜치<input type="text" id="ghBranch" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-<label>파일 경로<input type="text" id="ghPath" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-<label>액세스 토큰<input type="password" id="ghToken" autocomplete="off"></label>
-<label class="chk"><input type="checkbox" id="ghRem"> 이 기기에 토큰 저장</label>
+<div class="wrap">
+<header>
+  <a class="logo" href="./">hAmA<span>.</span></a>
+  <button class="theme" id="theme" type="button" aria-label="다크/라이트 모드 전환" title="다크/라이트 모드 전환">
+    <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</header>
+
+<section class="intro">
+  <h1>기록하고, 점검하고,<br>조금씩 나아지는 곳</h1>
+  <p>매일 쓰는 작은 도구들을 모아두었습니다.</p>
+</section>
+
+<h2>TOOLS</h2>
+<ul class="list">
+  <li>
+    <a class="item" href="tqqq/">
+      <span class="meta"><span class="tag">투자</span><span>·</span><span>사용 중</span></span>
+      <span class="title">TQQQ 무한매수</span>
+      <span class="desc">무한매수법 주문 계산 · 토스 자동 주문 · 체결 이력</span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </li>
+  <li>
+    <div class="item soon" aria-disabled="true">
+      <span class="meta"><span class="tag">생활</span><span>·</span><span class="badge">준비 중</span></span>
+      <span class="title">플랜</span>
+      <span class="desc">연간계획 점검과 가계부</span>
+    </div>
+  </li>
+</ul>
+
+<footer>© <span id="yr">2026</span> hAmA</footer>
 </div>
-<p class="note">이력은 위 저장소의 지정한 파일(JSON)에 커밋으로 저장됩니다. 공개 저장소에 저장하면 이력이 누구에게나 보이므로, 이력 전용 비공개(private) 저장소를 따로 만드는 것을 권장합니다. 토큰은 GitHub의 Settings → Developer settings → Fine-grained tokens에서 그 저장소 하나만 선택하고 Contents 권한을 Read and write로 발급하세요. 토큰은 이 기기 브라우저에만 저장되고 저장소에는 올라가지 않습니다. 공용 기기에서는 “이 기기에 토큰 저장”을 끄세요.</p>
-</details>
-<details id="tscfg"><summary>토스 자동 주문 연결 설정</summary>
-<div class="grid" style="margin-top:8px">
-<label>중계 서버 주소<input type="text" id="tsUrl" placeholder="http://localhost:8787" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
-<label>중계 키<input type="password" id="tsKey" autocomplete="off"></label>
-<label class="chk"><input type="checkbox" id="tsRem"> 이 기기에 키 저장</label>
-</div>
-<div class="row"><button id="tsCheck">연결 확인</button><button id="tsSync">토스 체결 불러오기</button></div>
-<p class="note">토스 주문은 집 PC에서 실행 중인 중계 서버(toss-relay)를 통해 나갑니다. 이 PC에서는 http://localhost:8787, 다른 기기에서는 tunnel.cmd가 보여주는 https://….trycloudflare.com 주소를 입력하세요. 중계 키는 중계 서버의 config.json에 있는 relayKey입니다. 사이트를 열면 GitHub 이력을 불러온 뒤 토스의 실제 체결 이력과 비교합니다. 이미 입력된 기록과 같은 거래(미국 거래일 ±3일, 같은 가격)는 연결만 하고, 기록에 없는 체결만 미국 거래일 날짜로 추가한 뒤 GitHub에 저장합니다.</p>
-</details>
-<p class="note" id="tstat" style="margin:6px 0 0"></p></div>
-<nav><a href="#s-order">오늘 주문</a><a href="#fform">체결 기록</a><a href="#s-hist">이력</a><a href="#s-cfg">설정</a><a href="#" id="foldAll" class="sm">모두 접기</a><a href="#" id="unfoldAll" class="sm">모두 펼치기</a></nav>
-
-<section class="card" id="s-cfg">
-<h2>1. 전략 설정</h2>
-<div class="grid">
-<label>총 투자 총액 ($)<input type="number" id="total" step="any"></label>
-<label>폭락 예비금 비율 (%)<input type="number" id="rp" step="any"></label>
-<label>분할 수<input type="number" id="N" step="1"></label>
-<label>목표 수익률 (%)<input type="number" id="tg" step="any"></label>
-<label>첫 매수 (전일 종가 +%)<input type="number" id="fb" step="any"></label>
-<label>종료 시한<input type="date" id="dl"></label>
-<label class="chk"><input type="checkbox" id="m01"> 별가 매수는 -$0.01</label>
-<label class="chk"><input type="checkbox" id="re"> 사이클 수익 재투자</label>
-</div>
-<p class="note">총 투자 총액은 처음 시작할 때의 금액입니다. 체결 기록을 입력하면 이후의 잔금, 평단, 수량, 예비금 잔액은 자동 계산됩니다.</p>
-</section>
-
-<section class="card">
-<h2>2. 현재 상태</h2>
-<div class="kpi" id="posKpi"></div>
-<div class="grid" id="pcw">
-<label>전일 종가 ($)<input type="number" id="pc" step="any"></label>
-</div>
-<p class="note" id="pcn">보유 수량이 0일 때(새 사이클 첫 매수)만 전일 종가가 필요합니다.</p>
-</section>
-
-<section class="card" id="s-order">
-<h2>3. 오늘의 LOC 주문</h2>
-<div class="kpi" id="kpi"></div>
-<div id="msgs"></div>
-<div class="scroll"><table><thead><tr><th>구분</th><th>주문 유형</th><th>가격</th><th>수량</th><th>금액</th><th></th></tr></thead><tbody id="orders"></tbody></table></div>
-</section>
-
-<section class="card">
-<h2>4. 폭락 예비금 규칙</h2>
-<div class="grid">
-<label>1단계 평단 대비 하락 (%)<input type="number" id="d1" step="any"></label>
-<label>2단계 평단 대비 하락 (%)<input type="number" id="d2" step="any"></label>
-<label>3단계 평단 대비 하락 (%)<input type="number" id="d3" step="any"></label>
-<label>1단계 투입 (예비금의 %)<input type="number" id="s1" step="any"></label>
-<label>2단계 투입 (예비금의 %)<input type="number" id="s2" step="any"></label>
-</div>
-<div class="kpi" id="rKpi" style="margin-top:10px"></div>
-<div class="scroll"><table><thead><tr><th>단계</th><th>발동 가격</th><th>투입금</th><th>수량</th><th>상태</th><th></th></tr></thead><tbody id="tiers"></tbody></table></div>
-<p class="note" id="tsTierRes" style="white-space:pre-line"></p>
-<p class="note">3단계는 남은 예비금 전액입니다. 주문은 LOC가 아닌 지정가(또는 장중)로 넣습니다. 체결 기록에 단계를 지정해 입력하면 완료 처리됩니다.</p>
-</section>
-
-<section class="card" id="fform">
-<h2>5. 체결 기록 입력</h2>
-<div class="grid">
-<label>체결일<input type="date" id="fd"></label>
-<label>구분<select id="fs"><option value="buy">매수</option><option value="reserve">예비금 매수</option><option value="sell">매도</option></select></label>
-<label id="ftw" style="display:none">예비금 단계<select id="ft"><option value="1">1단계</option><option value="2">2단계</option><option value="3">3단계</option></select></label>
-<label>체결 가격 ($)<input type="number" id="fp" step="any"></label>
-<label>수량 (주)<input type="number" id="fq" step="1"></label>
-<label>메모<input type="text" id="fm"></label>
-</div>
-<p class="note" id="tprev"></p>
-<div class="row"><button class="pri" id="add">기록 추가</button><button class="ghsave">저장</button><span class="note" id="fmsg"></span></div>
-<p class="note">T 기록 규칙: 매수는 T에 (매수금 ÷ 그때의 1회 매수금)을 더하고, 일부 매도는 T × (남은 수량 ÷ 기존 수량)으로 줄이며(쿼터 매도는 ×0.75), 전량 매도는 T를 0으로 되돌립니다. 예비금 매수는 T를 바꾸지 않습니다. T는 체결 기록으로 자동 계산됩니다.</p>
-<p class="note">이미 보유 중인 포지션이 있다면 과거 체결을 같은 방식으로 입력하세요. 주문 표의 “체결 입력” 버튼을 누르면 가격과 수량이 자동으로 채워집니다.</p>
-</section>
-
-<section class="card" id="s-hist">
-<h2>6. 이력</h2>
-<div class="kpi" id="hKpi"></div>
-<h2 style="font-size:14px">사이클 요약</h2>
-<div class="scroll"><table><thead><tr><th>사이클</th><th>기간</th><th>매수 합계</th><th>매도 합계</th><th>손익</th><th>수익률</th></tr></thead><tbody id="cycles"></tbody></table></div>
-<h2 style="font-size:14px;margin-top:14px">체결 내역</h2>
-<div class="scroll"><table><thead><tr><th>날짜</th><th>구분</th><th>가격</th><th>수량</th><th>금액</th><th>T(기록 후)</th><th>메모</th><th></th></tr></thead><tbody id="hist"></tbody></table></div>
-
-</section>
-
-<section class="card">
-<details><summary>계산 공식과 확인할 점</summary>
-<p class="note">1회 매수금 = 잔금 ÷ (분할 수 − T)<br>
-T는 체결 기록마다 갱신합니다: 매수 시 T += 매수금 ÷ 1회 매수금, 일부 매도 시 T × (남은 수량 ÷ 기존 수량), 전량 매도 시 0 (소수 둘째 자리 올림)<br>
-별% = 목표% − (목표% × 2 ÷ 분할 수) × T<br>
-전반전(T &lt; 분할 수 ÷ 2): 평단 LOC 0.5회 + 별가 LOC 0.5회 / 후반전: 별가 LOC 1회<br>
-매도: 수량의 1/4은 별가 LOC, 나머지 3/4은 평단 × (1 + 목표%) 지정가<br>
-사이클은 보유 수량이 0이 되는 매도로 종료됩니다. 종료 시 재투자를 켜 두면 전체 자산을 다시 원금과 예비금 비율로 나눕니다.<br>
-원금 소진(T &gt; 분할 수 − 1) 이후의 쿼터손절 절차는 직접 계산하지 않습니다.<br><br>
-이 공식은 널리 알려진 V2.1~V2.2 계열 해석을 구현한 것이며, 라오어 원문과 세부 규칙이 다를 수 있습니다. 실제 주문 전에 원문과 비교해 확인하세요. 투자 조언이 아니며 손익은 본인 책임입니다.</p></details>
-</section>
-</main>
 <script>
-const $=id=>document.getElementById(id);
-const LS="tqqq-ib3-s",LE="tqqq-ib3-e";
-const DEF={total:10000,rp:20,N:40,tg:15,fb:12,dl:"",m01:true,re:true,pc:"",tov:"",d1:15,d2:25,d3:35,s1:25,s2:25,tossFrom:""};
-let S=Object.assign({},DEF),E=[],ORD=[],TIER=[],armed=null,LASTPX=null;
-try{const a=localStorage.getItem(LS),b=localStorage.getItem(LE);if(a)S=Object.assign(S,JSON.parse(a));if(b)E=JSON.parse(b)}catch(e){}
-const ids=["total","rp","N","tg","fb","dl","pc","d1","d2","d3","s1","s2"];
-const num=v=>(v===""||v==null||isNaN(+v))?null:+v;
-const usd=n=>(n<0?"-$":"$")+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fl=n=>Math.floor(n*100+1e-9)/100,ce=n=>Math.ceil(n*100-1e-9)/100;
-const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const kp=(l,v)=>`<div><b>${v}</b><span>${l}</span></div>`;
-const today=()=>new Date().toLocaleDateString("sv-SE");
-const SIDE={buy:"매수",reserve:"예비금 매수",sell:"매도"};
-function load(){ids.forEach(i=>$(i).value=S[i]);$("m01").checked=!!S.m01;$("re").checked=!!S.re}
-const LC="tqqq-gh-cfg";
-let GH={owner:"",repo:"",branch:"main",path:"data/tqqq-history.json",token:"",remember:true};
-let lastSha=null,dirty=false,force=false,armLoad=false,busy=false,lastMsg="",lastBad=false;
-try{GH=Object.assign(GH,JSON.parse(localStorage.getItem(LC)||"{}"))}catch(e){}
-function paint(t,bad){document.querySelectorAll(".gst").forEach(el=>{el.textContent=t;el.style.color=bad?"var(--buy)":""})}
-function setSync(t,bad){lastMsg=t;lastBad=!!bad;paint(t,bad)}
-function updStatus(){dirty?paint("저장되지 않은 변경이 있습니다. GitHub에 저장하세요.",false):paint(lastMsg,lastBad)}
-function save(){
-  try{localStorage.setItem(LS,JSON.stringify(S));localStorage.setItem(LE,JSON.stringify(E))}catch(e){}
-  dirty=true;force=false;armLoad=false;updStatus();
-}
-function ghReady(){return !!(GH.owner&&GH.repo&&GH.token&&GH.path&&GH.branch)}
-function ghUrl(){return "https://api.github.com/repos/"+encodeURIComponent(GH.owner)+"/"+encodeURIComponent(GH.repo)+"/contents/"+GH.path.split("/").map(encodeURIComponent).join("/")}
-function ghFetch(method,body,qs){
-  const hd={"Accept":"application/vnd.github+json","Authorization":"Bearer "+GH.token,"X-GitHub-Api-Version":"2022-11-28"};
-  if(body)hd["Content-Type"]="application/json";
-  return fetch(ghUrl()+(qs||""),{method,cache:"no-store",headers:hd,body:body?JSON.stringify(body):undefined});
-}
-function errMsg(r){
-  if(r.status===401)return "토큰이 올바르지 않거나 만료되었습니다.";
-  if(r.status===403)return "권한이 없거나 요청 한도를 넘었습니다. 토큰의 Contents 권한을 확인하세요.";
-  if(r.status===404)return "저장소, 브랜치 또는 경로를 찾을 수 없습니다. 이름과 토큰의 저장소 접근 권한을 확인하세요.";
-  if(r.status===409||r.status===422)return "다른 곳에서 먼저 저장되어 충돌했습니다. 불러오기를 먼저 하세요.";
-  return "GitHub 오류 ("+r.status+")";
-}
-function b64enc(s){const by=new TextEncoder().encode(s);let b="";by.forEach(c=>b+=String.fromCharCode(c));return btoa(b)}
-function b64dec(s){const b=atob(s.replace(/\s/g,""));const by=new Uint8Array(b.length);for(let i=0;i<b.length;i++)by[i]=b.charCodeAt(i);return new TextDecoder().decode(by)}
-function needCfg(){setSync("먼저 GitHub 연결 설정(소유자, 저장소, 토큰)을 입력하세요.",true);$("ghcfg").open=true}
-async function ghLoad(){
-  if(busy)return;
-  if(!ghReady()){needCfg();return}
-  if(dirty&&!armLoad){armLoad=true;paint("저장하지 않은 변경이 있습니다. 불러오면 사라집니다. 계속하려면 불러오기를 한 번 더 누르세요.",true);return}
-  armLoad=false;busy=true;setSync("불러오는 중...");
-  try{
-    const r=await ghFetch("GET",null,"?ref="+encodeURIComponent(GH.branch));
-    if(r.status===404){setSync("저장된 이력 파일이 없거나 저장소를 찾을 수 없습니다. 처음이라면 먼저 저장하세요.",true);return}
-    if(!r.ok){setSync(errMsg(r),true);return}
-    const j=await r.json(),data=JSON.parse(b64dec(j.content));
-    S=Object.assign({},DEF,data.settings||{});E=Array.isArray(data.entries)?data.entries:[];
-    lastSha=j.sha;dirty=false;force=false;
-    try{localStorage.setItem(LS,JSON.stringify(S));localStorage.setItem(LE,JSON.stringify(E))}catch(e){}
-    load();render();setSync("GitHub에서 불러옴 · "+E.length+"건 ("+new Date().toLocaleString("ko-KR")+")");
-  }catch(e){setSync("불러오지 못했습니다: "+(e.message||"네트워크 오류"),true)}
-  finally{busy=false}
-}
-async function ghSave(){
-  if(busy)return;
-  if(!ghReady()){needCfg();return}
-  busy=true;setSync("저장 중...");
-  try{
-    const g=await ghFetch("GET",null,"?ref="+encodeURIComponent(GH.branch));
-    let sha=null;
-    if(g.status===200){
-      sha=(await g.json()).sha;
-      if(sha!==lastSha&&!force){
-        force=true;
-        setSync((lastSha?"다른 기기에서 저장된 변경이 있습니다.":"GitHub에 이미 저장된 이력이 있습니다.")+" 먼저 불러오기를 하거나, 덮어쓰려면 저장을 한 번 더 누르세요.",true);return;
-      }
-    }else if(g.status!==404){setSync(errMsg(g),true);return}
-    const now=new Date().toISOString();
-    const body={message:"무한매수 이력 저장 "+now,content:b64enc(JSON.stringify({v:1,savedAt:now,settings:S,entries:E},null,1)),branch:GH.branch};
-    if(sha)body.sha=sha;
-    const p=await ghFetch("PUT",body);
-    if(!p.ok){setSync(errMsg(p),true);return}
-    const j=await p.json();lastSha=j.content.sha;dirty=false;force=false;
-    setSync("GitHub에 저장됨 · "+E.length+"건 ("+new Date().toLocaleString("ko-KR")+")");
-  }catch(e){setSync("저장하지 못했습니다: "+(e.message||"네트워크 오류"),true)}
-  finally{busy=false}
-}
-function hasT(e){return e.t!==undefined&&e.t!==null&&e.t!==""&&!isNaN(+e.t)}
-function derive(){
-  const N=+S.N||40,rate=(+S.rp||0)/100;
-  let total=+S.total||0,capC=total*(1-rate),resC=total*rate;
-  let cash=capC,qty=0,cost=0,resUsed=0,tiers={},cyc=1,start=null,cp=0,cc=0,cycles=[],pnlAll=0,T=0;const Ta={};
-  const arr=E.slice().sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.ts-b.ts);
-  for(const e of arr){
-    const v=e.p*e.q;
-    if(e.side==="sell"){
-      const q=Math.min(e.q,qty);if(q<=0){Ta[e.ts]=T;continue}
-      const before=qty;
-      cost-=cost*q/qty;const pr=e.p*q;cash+=pr;cp+=pr;qty-=q;
-      if(qty<=0){
-        const pnl=cp-cc;pnlAll+=pnl;cycles.push({n:cyc,s:start,e:e.d,cc,cp,pnl});
-        total=cash+(resC-resUsed);
-        if(S.re){capC=total*(1-rate);resC=total*rate}
-        cash=capC;cost=0;qty=0;resUsed=0;tiers={};cyc++;start=null;cp=0;cc=0;T=0;
-      }else T=hasT(e)?+e.t:ce(T*qty/before);
-    }else{
-      if(!start)start=e.d;
-      if(e.side==="reserve"){resUsed+=v;tiers[e.tier]=1;if(hasT(e))T=+e.t}
-      else{
-        const unit=(cash>0&&N-T>0)?cash/(N-T):capC/N;
-        cash-=v;T=hasT(e)?+e.t:ce(T+v/unit);
-      }
-      qty+=e.q;cost+=v;cc+=v;
-    }
-    Ta[e.ts]=T;
+(function(){
+  document.getElementById("yr").textContent=new Date().getFullYear();
+  var root=document.documentElement;
+  function current(){
+    var t=root.getAttribute("data-theme");
+    if(t==="light"||t==="dark")return t;
+    return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
   }
-  return {capC,resC,cash,qty,avg:qty>0?cost/qty:0,resLeft:resC-resUsed,tiers,cyc,start,cycles,pnlAll,total,T,Ta};
-}
-function render(){
-  const N=+S.N||40,tg=+S.tg||0,fb=+S.fb||0,pc=num(S.pc);
-  const D=derive(),{capC,resC,cash,qty,avg,resLeft}=D;
-  const days=!S.dl?"미설정":(()=>{const d=Math.ceil((new Date(S.dl+"T23:59:59")-new Date())/864e5);return d>=0?d+"일":"시한 경과"})();
-  $("posKpi").innerHTML=kp("사이클",D.cyc+"회차")+kp("현재 T",D.T.toFixed(2))+kp("보유 수량",qty+"주")+kp("평단가",qty>0?usd(avg):"-")+kp("사이클 잔금",usd(cash))+kp("예비금 잔액",usd(resLeft))+kp("종료까지",days);
-  const T=D.T;
-  $("pcw").style.display=$("pcn").style.display=qty===0?"":"none";
-  const ex=T>N-1;
-  const unit=(ex||cash<=0)?0:cash/(N-T);
-  const star=tg-(tg*2/N)*T,front=T<N/2,sub=S.m01?0.01:0;
-  ORD=[];const msgs=[];
-  if(cash<0)msgs.push("잔금이 마이너스입니다. 체결 기록이나 총 투자 총액을 확인하세요.");
-  if(qty===0){
-    if(pc==null)msgs.push("전일 종가를 입력하면 첫 매수 주문을 계산합니다.");
-    else{const p=fl(pc*(1+fb/100)),q=Math.floor(unit/p);ORD.push({side:"buy",type:"LOC (첫 매수)",p,q});if(q<1)msgs.push("1회 매수금으로 1주를 살 수 없습니다.")}
-  }else{
-    const starP=avg*(1+star/100);
-    if(ex)msgs.push(`원금 소진 구간입니다(T=${T.toFixed(2)}). 신규 LOC 매수는 없습니다. 쿼터손절 모드는 원문 규칙대로 직접 진행하세요. 보유 수량의 1/4은 ${Math.floor(qty/4)}주입니다.`);
-    else if(front){
-      const pa=fl(avg),pb=fl(starP-sub),qa=Math.floor(unit/2/pa),qb=Math.floor(unit/2/pb);
-      ORD.push({side:"buy",type:"LOC 평단 0.5회",p:pa,q:qa},{side:"buy",type:"LOC 별가 0.5회",p:pb,q:qb});
-      if(qa<1||qb<1)msgs.push("반 회차 금액이 1주 미만인 주문이 있습니다.");
-    }else{
-      const pb=fl(starP-sub),qb=Math.floor(unit/pb);
-      ORD.push({side:"buy",type:"LOC 별가 1회",p:pb,q:qb});
-      if(qb<1)msgs.push("1회 매수금으로 1주를 살 수 없습니다.");
-    }
-    const q1=Math.floor(qty/4),q2=qty-q1;
-    if(q1>0)ORD.push({side:"sell",type:"LOC 별가 (수량의 1/4)",p:ce(starP),q:q1});
-    if(q2>0)ORD.push({side:"sell",type:"지정가 목표가 (나머지 3/4)",p:ce(avg*(1+tg/100)),q:q2});
-  }
-  $("orders").innerHTML=ORD.length?ORD.map((o,i)=>`<tr><td class="${o.side}" data-l="구분">${SIDE[o.side]}</td><td data-l="주문 유형">${o.type}</td><td data-l="가격">${usd(o.p)}</td><td data-l="수량">${o.q}주</td><td data-l="금액">${usd(o.p*o.q)}</td><td class="w"><button class="mini" data-f="${i}">체결 입력</button></td></tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--mut)">전일 종가를 입력하면 주문이 표시됩니다.</td></tr>`;
-  $("kpi").innerHTML=kp("T",T.toFixed(2))+kp("별%",star.toFixed(2)+"%")+kp("1회 매수금",usd(unit))+kp("구간",ex?"소진":front?"전반전":"후반전");
-  $("msgs").innerHTML=msgs.map(m=>`<div class="msg">${m}</div>`).join("");
-  // 예비금
-  $("rKpi").innerHTML=kp("예비금 전체",usd(resC))+kp("남은 예비금",usd(Math.max(0,resLeft)));
-  const left=Math.max(0,resLeft);
-  const defs=[[1,num(S.d1),Math.min(left,resC*(num(S.s1)||0)/100)],[2,num(S.d2),Math.min(left,resC*(num(S.s2)||0)/100)],[3,num(S.d3),left]];
-  TIER=[];
-  $("tiers").innerHTML=defs.map(([n,d,a])=>{
-    const done=!!D.tiers[n];
-    if(!(avg>0)||d==null)return `<tr><td>${n}단계 (-${d==null?"?":d}%)</td><td colspan="5" style="color:var(--mut)">${done?"체결 완료":"보유 포지션이 생기면 계산됩니다"}</td></tr>`;
-    const p=fl(avg*(1-d/100)),q=Math.floor(a/p),hit=LASTPX!=null&&LASTPX<=avg*(1-d/100);
-    TIER[n]={p,q};
-    return `<tr><td data-l="단계">${n}단계 (-${d}%)</td><td data-l="발동 가격">${usd(p)}</td><td data-l="투입금">${usd(a)}</td><td data-l="수량">${q}주</td><td data-l="상태" class="${hit&&!done?"buy":""}">${done?"체결 완료":hit?"조건 도달":"대기"}</td><td class="w">${done||q<1?"":`<button class="mini" data-t="${n}">체결 입력</button> <button class="mini" data-ts="${n}">토스 주문</button>`}</td></tr>`;
-  }).join("");
-  // 이력
-  const wins=D.cycles.filter(c=>c.pnl>0).length;
-  $("hKpi").innerHTML=kp("누적 실현손익",`<span class="${D.pnlAll>=0?"pos":"neg"}" style="font-size:17px;color:inherit">${usd(D.pnlAll)}</span>`)+kp("완료 사이클",D.cycles.length+"회")+kp("승/패",wins+" / "+(D.cycles.length-wins))+kp("체결 기록",E.length+"건");
-  $("cycles").innerHTML=D.cycles.length?D.cycles.map(c=>`<tr><td data-l="사이클">${c.n}회차</td><td data-l="기간">${c.s||"-"} ~ ${c.e}</td><td data-l="매수 합계">${usd(c.cc)}</td><td data-l="매도 합계">${usd(c.cp)}</td><td data-l="손익" class="${c.pnl>=0?"pos":"neg"}">${usd(c.pnl)}</td><td data-l="수익률" class="${c.pnl>=0?"pos":"neg"}">${c.cc>0?(c.pnl/c.cc*100).toFixed(2)+"%":"-"}</td></tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--mut)">완료된 사이클이 없습니다.</td></tr>`;
-  const arr=E.slice().sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:b.ts-a.ts);
-  $("hist").innerHTML=arr.length?arr.map(e=>`<tr><td data-l="날짜">${esc(e.d)}</td><td data-l="구분" class="${e.side==="sell"?"sell":"buy"}">${SIDE[e.side]}${e.side==="reserve"?" "+e.tier+"단계":""}</td><td data-l="가격">${usd(e.p)}</td><td data-l="수량">${e.q}주</td><td data-l="금액">${usd(e.p*e.q)}</td><td data-l="기록 후 T">${(D.Ta[e.ts]||0).toFixed(2)}${hasT(e)?" (직접)":""}</td><td data-l="메모" class="w" style="text-align:left">${esc(e.memo)||"-"}</td><td class="w"><button class="mini" data-del="${e.ts}">${armed===e.ts?"정말 삭제":"삭제"}</button></td></tr>`).join(""):`<tr><td colspan="7" style="text-align:center;color:var(--mut)">아직 체결 기록이 없습니다.</td></tr>`;
-}
-function fill(side,p,q,tier,memo){
-  unfold($("fform"));
-  $("fd").value=today();$("fs").value=side;$("ft").value=tier||1;$("ftw").style.display=side==="reserve"?"":"none";
-  $("fp").value=p;$("fq").value=q;$("fm").value=memo||"";$("fmsg").textContent="";updatePrev();
-  $("fform").scrollIntoView({behavior:"smooth"});
-}
-document.addEventListener("click",ev=>{
-  const b=ev.target.closest("button");if(!b)return;const d=b.dataset;
-  if(d.f!==undefined){const o=ORD[+d.f];fill(o.side,o.p,o.q,0,o.type)}
-  else if(d.t!==undefined){const t=TIER[+d.t];fill("reserve",t.p,t.q,+d.t,"폭락 예비금")}
-  else if(d.ts!==undefined){const n=+d.ts,t=TIER[n];if(t)tsSend([{key:"r"+n,side:"BUY",kind:"LIMIT",symbol:SYM,price:t.p,quantity:t.q}],tsTierOut)}
-  else if(d.del!==undefined){
-    const ts=+d.del;
-    if(armed===ts){E=E.filter(e=>e.ts!==ts);armed=null;save();render()}
-    else{armed=ts;render();setTimeout(()=>{if(armed===ts){armed=null;render()}},3000)}
-  }
-});
-$("fs").addEventListener("change",()=>{$("ftw").style.display=$("fs").value==="reserve"?"":"none"});
-$("add").addEventListener("click",()=>{
-  const d=$("fd").value,side=$("fs").value,p=num($("fp").value),q=Math.floor(num($("fq").value)||0);
-  if(!d||!(p>0)||q<1){$("fmsg").textContent="날짜, 가격, 수량(1주 이상)을 확인하세요.";return}
-  E.push({ts:Date.now(),d,side,p,q,tier:side==="reserve"?+$("ft").value:0,memo:$("fm").value.trim()});
-  $("fp").value="";$("fq").value="";$("fm").value="";$("fmsg").textContent="기록을 추가했습니다.";
-  save();render();
-});
-function updatePrev(){
-  const el=$("tprev");if(!el)return;
-  const d=$("fd").value||today(),side=$("fs").value,p=num($("fp").value),q=Math.floor(num($("fq").value)||0);
-  if(!(p>0)||q<1){el.textContent="";return}
-  const cur=derive(),tmp={ts:Number.MAX_SAFE_INTEGER,d,side,p,q,tier:+$("ft").value,memo:""};
-  const bk=E;E=E.concat([tmp]);const nx=derive();E=bk;
-  const end=nx.cycles.length>cur.cycles.length;
-  el.textContent=`현재 T ${cur.T.toFixed(2)} → 기록 후 T ${(nx.Ta[tmp.ts]||0).toFixed(2)}${end?" · 전량 매도로 사이클 종료":""}`;
-}
-const _render=render;render=function(){_render();updatePrev()};
-["fd","fs","ft","fp","fq"].forEach(i=>{$(i).addEventListener("input",updatePrev);$(i).addEventListener("change",updatePrev)});
-ids.forEach(i=>$(i).addEventListener("input",()=>{S[i]=$(i).value;save();render()}));
-["m01","re"].forEach(i=>$(i).addEventListener("change",()=>{S[i]=$(i).checked;save();render()}));
-$("fd").value=today();
-load();render();
-const LF="tqqq-fold";
-let FOLD={};try{FOLD=JSON.parse(localStorage.getItem(LF)||"{}")}catch(e){}
-function secKey(s){return s.firstElementChild.textContent.trim()}
-function setFold(s,closed){
-  s.classList.toggle("closed",closed);s.firstElementChild.setAttribute("aria-expanded",String(!closed));
-  FOLD[secKey(s)]=closed;try{localStorage.setItem(LF,JSON.stringify(FOLD))}catch(e){}
-}
-function unfold(s){if(s&&s.classList.contains("closed"))setFold(s,false)}
-(function initFold(){
-  const secs=[...document.querySelectorAll("main>section.card")].filter(s=>s.firstElementChild&&s.firstElementChild.tagName==="H2");
-  secs.forEach(s=>{
-    const hd=s.firstElementChild,closed=!!FOLD[secKey(s)];
-    s.classList.add("fold");s.classList.toggle("closed",closed);
-    hd.setAttribute("role","button");hd.tabIndex=0;hd.setAttribute("aria-expanded",String(!closed));
-    hd.addEventListener("click",()=>setFold(s,!s.classList.contains("closed")));
-    hd.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();hd.click()}});
+  document.getElementById("theme").addEventListener("click",function(){
+    var next=current()==="dark"?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{localStorage.setItem("hama-theme",next)}catch(e){}
   });
-  $("foldAll").addEventListener("click",e=>{e.preventDefault();secs.forEach(s=>setFold(s,true))});
-  $("unfoldAll").addEventListener("click",e=>{e.preventDefault();secs.forEach(s=>setFold(s,false))});
-  document.querySelectorAll("nav a").forEach(a=>{const t=a.getAttribute("href");if(t&&t.length>1)a.addEventListener("click",()=>unfold(document.querySelector(t)))});
-})();
-(function initGH(){
-  if(!GH.owner&&/\.github\.io$/.test(location.hostname))GH.owner=location.hostname.split(".")[0];
-  $("ghOwner").value=GH.owner;$("ghRepo").value=GH.repo;$("ghBranch").value=GH.branch;$("ghPath").value=GH.path;$("ghToken").value=GH.token;$("ghRem").checked=GH.remember!==false;
-  const map={ghOwner:"owner",ghRepo:"repo",ghBranch:"branch",ghPath:"path",ghToken:"token"};
-  function persist(){const c=Object.assign({},GH);if(!GH.remember)c.token="";try{localStorage.setItem(LC,JSON.stringify(c))}catch(e){}}
-  Object.keys(map).forEach(id=>$(id).addEventListener("input",()=>{GH[map[id]]=$(id).value.trim();lastSha=null;force=false;persist()}));
-  $("ghRem").addEventListener("change",()=>{GH.remember=$("ghRem").checked;persist()});
-  document.querySelectorAll(".ghsave").forEach(b=>b.addEventListener("click",ghSave));
-  document.querySelectorAll(".ghload").forEach(b=>b.addEventListener("click",ghLoad));
-  window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
-  setSync(!ghReady()?"GitHub 연결 설정을 먼저 입력하세요.":E.length?"이 기기의 임시 저장본을 표시 중입니다. 최신 이력은 GitHub에서 불러오세요.":"연결 설정이 되어 있습니다. 불러오기 또는 저장을 누르세요.");
-})();
-// ---------- 토스 자동 주문 (중계 서버 toss-relay 경유) ----------
-const LT="tqqq-toss-cfg",SYM="TQQQ";
-let TS={url:"",key:"",remember:true},tsArm=null,tsBusy=false;
-try{TS=Object.assign(TS,JSON.parse(localStorage.getItem(LT)||"{}"))}catch(e){}
-function tsReady(){return !!(TS.url&&TS.key)}
-function tsStat(t,bad){const el=$("tstat");el.textContent=t;el.style.color=bad?"var(--buy)":""}
-function tsNeedCfg(){tsStat("먼저 토스 자동 주문 연결 설정(중계 서버 주소, 중계 키)을 입력하세요.",true);$("tscfg").open=true;$("gh").scrollIntoView({behavior:"smooth"})}
-async function tsFetch(p,opt){
-  opt=opt||{};let r;
-  try{
-    r=await fetch(TS.url.trim().replace(/\/+$/,"")+p,{method:opt.method||"GET",cache:"no-store",
-      headers:Object.assign({"X-Relay-Key":TS.key},opt.body?{"Content-Type":"application/json"}:{}),
-      body:opt.body?JSON.stringify(opt.body):undefined});
-  }catch(e){throw new Error("중계 서버에 연결할 수 없습니다. 집 PC에서 서버(start.cmd, 다른 기기라면 tunnel.cmd도)가 실행 중인지와 주소를 확인하세요.")}
-  let j=null;try{j=await r.json()}catch(e){}
-  if(!r.ok)throw new Error((j&&j.message)||("중계 서버 오류 ("+r.status+")"));
-  return j;
-}
-const tsOut=(t,bad)=>{const el=$("tsRes");el.textContent=t;el.style.color=bad?"var(--buy)":""};
-const tsTierOut=(t,bad)=>{const el=$("tsTierRes");el.textContent=t;el.style.color=bad?"var(--buy)":""};
-function todayTs(){return ORD.map((o,i)=>({key:(o.side==="sell"?"s":"b")+i,side:o.side==="sell"?"SELL":"BUY",kind:/LOC/.test(o.type)?"LOC":"LIMIT",symbol:SYM,price:o.p,quantity:o.q})).filter(o=>o.quantity>=1)}
-const tsLabel=o=>`${o.side==="SELL"?"매도":"매수"} ${o.kind==="LOC"?"LOC":"지정가"} ${usd(o.price)} × ${o.quantity}주`;
-async function tsSend(orders,out){
-  if(tsBusy)return;
-  if(!tsReady()){tsNeedCfg();return}
-  if(!orders.length){out("보낼 주문이 없습니다.",true);return}
-  const tok=JSON.stringify(orders);
-  if(tsArm!==tok){
-    tsArm=tok;
-    const buy=orders.filter(o=>o.side==="BUY").reduce((s,o)=>s+o.price*o.quantity,0);
-    out(`아래 ${orders.length}건(매수 합계 ${usd(buy)})을 토스로 보냅니다. 확정하려면 5초 안에 같은 버튼을 한 번 더 누르세요.\n`+orders.map(tsLabel).join("\n"),true);
-    setTimeout(()=>{if(tsArm===tok){tsArm=null;out("")}},5000);return;
-  }
-  tsArm=null;tsBusy=true;out("전송 중...");
-  try{
-    const j=await tsFetch("/orders",{method:"POST",body:{orders}});
-    const lines=j.results.map(r=>{const o=orders.find(x=>x.key===r.key);return (r.ok?(r.dryRun?"모의 ✓ ":r.resent?"재주문 ✓ ":"접수 ✓ "):r.already?"건너뜀 · ":"실패 ✗ ")+(o?tsLabel(o):r.key)+(r.ok?"":" — "+r.error)});
-    out((j.live?"토스 주문 결과":"[모의 실행] 중계 서버가 live:false라 실제 주문은 나가지 않았습니다")+"\n"+lines.join("\n"),j.results.some(r=>!r.ok&&!r.already));
-  }catch(e){out("전송하지 못했습니다: "+e.message,true)}
-  finally{tsBusy=false}
-}
-async function tsCheck(){
-  if(!tsReady()){tsNeedCfg();return}
-  tsStat("확인 중...");
-  try{
-    const j=await tsFetch("/status?check=1"),h=(j.holdings||[]).find(x=>String(x.symbol).toUpperCase()===SYM),D=derive();
-    if(h&&h.lastPrice>0){LASTPX=+h.lastPrice;render()}
-    tsStat(`연결됨 · ${j.live?"실거래 모드":"모의 실행 모드"} · 매수 1건 한도 ${usd(j.maxOrderUsd)}, 하루 ${usd(j.maxDailyBuyUsd)} · 토스 보유 ${h?h.quantity+"주 (평단 "+usd(h.averagePurchasePrice)+")":"없음"} / 기록상 ${D.qty}주${D.qty>0?" (평단 "+usd(D.avg)+")":""}`+((h?h.quantity:0)!==D.qty?" · ⚠ 보유 수량이 기록과 다릅니다":""),(h?h.quantity:0)!==D.qty);
-  }catch(e){tsStat("연결 실패: "+e.message,true)}
-}
-// 토스 체결 시각(한국 시간) → 미국 거래일
-const usDay=s=>{const t=Date.parse(s);return isNaN(t)?null:new Date(t).toLocaleDateString("sv-SE",{timeZone:"America/New_York"})};
-const dayDiff=(a,b)=>Math.abs(Date.parse(a+"T00:00:00Z")-Date.parse(b+"T00:00:00Z"))/864e5;
-const oidsOf=e=>(e.oids||[]).concat(e.oid?[e.oid]:[]);
-// 토스의 실제 체결 이력 전체와 기록을 맞춤: 이미 있는 기록(직접 입력 포함)과 같은 거래는 연결만 하고, 없는 거래만 추가
-async function tsSync(auto){
-  if(!tsReady()){if(!auto)tsNeedCfg();return}
-  if(tsBusy)return;
-  tsBusy=true;tsStat("토스 체결 내역을 불러오는 중...");
-  let added=0,linked=0,fixed=0;
-  try{
-    const first=E.map(e=>e.d).filter(Boolean).sort()[0];
-    const from=first?new Date(Date.parse(first+"T00:00:00Z")-7*864e5).toISOString().slice(0,10):new Date(Date.now()-365*864e5).toISOString().slice(0,10);
-    const j=await tsFetch("/fills?from="+encodeURIComponent(from));
-    const fills=(j.fills||[]).map(f=>{
-      const m=/-r([123])(?:-\d+)?$/.exec(f.clientOrderId||"");
-      return Object.assign({},f,{q:Math.floor(+f.quantity),p:+f.price,d:usDay(f.filledAt||f.orderedAt)||today(),side2:f.side==="SELL"?"sell":m?"reserve":"buy",tier:m?+m[1]:0});
-    }).filter(f=>f.q>=1&&f.p>0).sort((a,b)=>String(a.filledAt||a.orderedAt).localeCompare(String(b.filledAt||b.orderedAt)));
-    const byOid=new Map(fills.map(f=>[f.orderId,f]));
-    // 이전 버전이 한국 날짜로 넣은 자동 기록의 날짜를 미국 거래일로 바로잡음
-    for(const e of E){if(e.oid&&byOid.has(e.oid)&&/^토스 자동/.test(e.memo||"")){const d=byOid.get(e.oid).d;if(e.d!==d){e.d=d;fixed++}}}
-    const have=new Set(E.flatMap(oidsOf));
-    // 아직 토스 주문과 연결되지 않은 기록의 남은 수량
-    const left=new Map(E.filter(e=>!oidsOf(e).length).map(e=>[e,e.q]));
-    for(const f of fills){
-      if(have.has(f.orderId))continue;
-      const tol=Math.max(0.011,f.p*0.001);
-      const cands=[...left.keys()].filter(e=>left.get(e)>0&&(e.side==="sell")===(f.side2==="sell")&&Math.abs(e.p-f.p)<=tol&&dayDiff(e.d,f.d)<=3)
-        .sort((a,b)=>dayDiff(a.d,f.d)-dayDiff(b.d,f.d));
-      let need=f.q;
-      for(const e of cands){
-        if(need<=0)break;
-        const use=Math.min(need,left.get(e));
-        left.set(e,left.get(e)-use);need-=use;
-        e.oids=(e.oids||[]).concat(f.orderId);
-      }
-      if(need<f.q)linked++;
-      if(need>0){
-        let ts=Date.parse(f.filledAt||f.orderedAt)||Date.now();while(E.some(e=>e.ts===ts))ts++;
-        E.push({ts,d:f.d,side:f.side2,p:f.p,q:need,tier:f.tier,memo:"토스 자동 · "+(f.timeInForce==="CLS"?"LOC":"지정가")+(f.clientOrderId?"":" (앱에서 직접 주문)"),oid:f.orderId});
-        added++;
-      }
-      have.add(f.orderId);
-    }
-    // 연결 표시(oids) 변경도 저장해야 다음에 다시 비교하지 않음
-    const changed=added||linked||fixed;
-    if(changed){save();render()}
-    // 예비금 발동 여부 판단용 현재가 (토스 보유 종목 현재가)
-    try{const st=await tsFetch("/status?check=1"),h=(st.holdings||[]).find(x=>String(x.symbol).toUpperCase()===SYM);if(h&&h.lastPrice>0){LASTPX=+h.lastPrice;render()}}catch(e){}
-    const D=derive(),tossQty=fills.reduce((s,f)=>s+(f.side2==="sell"?-f.q:f.q),0);
-    tsStat(`토스 체결 이력(${from} 이후 주문) 확인 · 새로 추가 ${added}건, 기존 기록과 연결 ${linked}건${fixed?`, 날짜 수정 ${fixed}건`:""} · 기록상 보유 ${D.qty}주`+(D.qty!==tossQty?` (토스 체결 합계 ${tossQty}주와 다름: 이 기간 이전 거래나 직접 입력만 있는 기록을 확인하세요)`:""),D.qty!==tossQty);
-    tsBusy=false;
-    if(changed&&ghReady())await ghSave();
-  }catch(e){tsStat("토스 체결을 불러오지 못했습니다: "+e.message,true)}
-  finally{tsBusy=false}
-}
-(function initToss(){
-  $("tsUrl").value=TS.url;$("tsKey").value=TS.key;$("tsRem").checked=TS.remember!==false;
-  function persist(){const c=Object.assign({},TS);if(!TS.remember)c.key="";try{localStorage.setItem(LT,JSON.stringify(c))}catch(e){}}
-  $("tsUrl").addEventListener("input",()=>{TS.url=$("tsUrl").value.trim();persist()});
-  $("tsKey").addEventListener("input",()=>{TS.key=$("tsKey").value.trim();persist()});
-  $("tsRem").addEventListener("change",()=>{TS.remember=$("tsRem").checked;persist()});
-  $("tsCheck").addEventListener("click",tsCheck);
-  $("tsSync").addEventListener("click",()=>tsSync(false));
-  $("tsSend").addEventListener("click",()=>tsSend(todayTs(),tsOut));
-  if(!tsReady())return;
-  // 열 때: GitHub 최신 이력을 불러온 뒤 토스 체결을 기록하고 저장
-  (async()=>{
-    if(ghReady()){await ghLoad();if(!lastSha)return}
-    await tsSync(true);
-  })();
 })();
 </script>
 </body>
