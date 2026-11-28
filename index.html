@@ -66,8 +66,9 @@ td button{width:100%}
 <main>
 <h1>TQQQ 무한매수법 주문 계산기</h1>
 <div class="card" id="gh">
-<h2>이력 저장 (GitHub)</h2>
-<div class="row" style="margin-top:0"><button class="pri ghsave">GitHub에 저장</button><button class="ghload">GitHub에서 불러오기</button></div>
+<h2>주문 전송 · 이력 저장</h2>
+<div class="row" style="margin-top:0"><button class="pri" id="tsSend">토스로 오늘 주문 전송</button><button class="ghsave">GitHub에 저장</button><button class="ghload">GitHub에서 불러오기</button></div>
+<p class="note" id="tsRes" style="white-space:pre-line;margin:8px 0 0"></p>
 <p class="note gst" id="sync" style="margin:8px 0 0"></p>
 <details id="ghcfg"><summary>GitHub 연결 설정</summary>
 <div class="grid" style="margin-top:8px">
@@ -110,10 +111,10 @@ td button{width:100%}
 <section class="card">
 <h2>2. 현재 상태</h2>
 <div class="kpi" id="posKpi"></div>
-<div class="grid">
+<div class="grid" id="pcw">
 <label>전일 종가 ($)<input type="number" id="pc" step="any"></label>
-<label>T 직접 입력 (선택)<input type="number" id="tov" step="any"></label>
 </div>
+<p class="note" id="pcn">보유 수량이 0일 때(새 사이클 첫 매수)만 전일 종가가 필요합니다.</p>
 </section>
 
 <section class="card" id="s-order">
@@ -121,8 +122,6 @@ td button{width:100%}
 <div class="kpi" id="kpi"></div>
 <div id="msgs"></div>
 <div class="scroll"><table><thead><tr><th>구분</th><th>주문 유형</th><th>가격</th><th>수량</th><th>금액</th><th></th></tr></thead><tbody id="orders"></tbody></table></div>
-<div class="row"><button class="pri" id="tsSend">토스로 오늘 주문 전송</button></div>
-<p class="note" id="tsRes" style="white-space:pre-line;margin:8px 0 0"></p>
 </section>
 
 <section class="card">
@@ -153,7 +152,7 @@ td button{width:100%}
 </div>
 <p class="note" id="tprev"></p>
 <div class="row"><button class="pri" id="add">기록 추가</button><button class="ghsave">GitHub에 저장</button><span class="note" id="fmsg"></span></div>
-<p class="note">T 기록 규칙: 매수는 T에 (매수금 ÷ 그때의 1회 매수금)을 더하고, 일부 매도는 T × (남은 수량 ÷ 기존 수량)으로 줄이며(쿼터 매도는 ×0.75), 전량 매도는 T를 0으로 되돌립니다. 예비금 매수는 T를 바꾸지 않습니다. 원문 값과 다르면 “기록 후 T” 칸에 직접 입력하세요.</p>
+<p class="note">T 기록 규칙: 매수는 T에 (매수금 ÷ 그때의 1회 매수금)을 더하고, 일부 매도는 T × (남은 수량 ÷ 기존 수량)으로 줄이며(쿼터 매도는 ×0.75), 전량 매도는 T를 0으로 되돌립니다. 예비금 매수는 T를 바꾸지 않습니다. 원문 값과 다르면 “기록 후 T” 칸에 직접 입력하세요. 현재 T는 체결 기록으로 자동 계산됩니다.</p>
 <p class="note">이미 보유 중인 포지션이 있다면 과거 체결을 같은 방식으로 입력하세요. 주문 표의 “체결 입력” 버튼을 누르면 가격과 수량이 자동으로 채워집니다.</p>
 </section>
 
@@ -183,9 +182,9 @@ T는 체결 기록마다 갱신합니다: 매수 시 T += 매수금 ÷ 1회 매�
 const $=id=>document.getElementById(id);
 const LS="tqqq-ib3-s",LE="tqqq-ib3-e";
 const DEF={total:10000,rp:20,N:40,tg:15,fb:12,dl:"",m01:true,re:true,pc:"",tov:"",d1:15,d2:25,d3:35,s1:25,s2:25,tossFrom:""};
-let S=Object.assign({},DEF),E=[],ORD=[],TIER=[],armed=null;
+let S=Object.assign({},DEF),E=[],ORD=[],TIER=[],armed=null,LASTPX=null;
 try{const a=localStorage.getItem(LS),b=localStorage.getItem(LE);if(a)S=Object.assign(S,JSON.parse(a));if(b)E=JSON.parse(b)}catch(e){}
-const ids=["total","rp","N","tg","fb","dl","pc","tov","d1","d2","d3","s1","s2"];
+const ids=["total","rp","N","tg","fb","dl","pc","d1","d2","d3","s1","s2"];
 const num=v=>(v===""||v==null||isNaN(+v))?null:+v;
 const usd=n=>(n<0?"-$":"$")+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 const fl=n=>Math.floor(n*100+1e-9)/100,ce=n=>Math.ceil(n*100-1e-9)/100;
@@ -299,7 +298,8 @@ function render(){
   const D=derive(),{capC,resC,cash,qty,avg,resLeft}=D;
   const days=!S.dl?"미설정":(()=>{const d=Math.ceil((new Date(S.dl+"T23:59:59")-new Date())/864e5);return d>=0?d+"일":"시한 경과"})();
   $("posKpi").innerHTML=kp("사이클",D.cyc+"회차")+kp("현재 T",D.T.toFixed(2))+kp("보유 수량",qty+"주")+kp("평단가",qty>0?usd(avg):"-")+kp("사이클 잔금",usd(cash))+kp("예비금 잔액",usd(resLeft))+kp("종료까지",days);
-  const T=num(S.tov)!=null?num(S.tov):D.T;
+  const T=D.T;
+  $("pcw").style.display=$("pcn").style.display=qty===0?"":"none";
   const ex=T>N-1;
   const unit=(ex||cash<=0)?0:cash/(N-T);
   const star=tg-(tg*2/N)*T,front=T<N/2,sub=S.m01?0.01:0;
@@ -335,7 +335,7 @@ function render(){
   $("tiers").innerHTML=defs.map(([n,d,a])=>{
     const done=!!D.tiers[n];
     if(!(avg>0)||d==null)return `<tr><td>${n}단계 (-${d==null?"?":d}%)</td><td colspan="5" style="color:var(--mut)">${done?"체결 완료":"보유 포지션이 생기면 계산됩니다"}</td></tr>`;
-    const p=fl(avg*(1-d/100)),q=Math.floor(a/p),hit=pc!=null&&pc<=avg*(1-d/100);
+    const p=fl(avg*(1-d/100)),q=Math.floor(a/p),hit=LASTPX!=null&&LASTPX<=avg*(1-d/100);
     TIER[n]={p,q};
     return `<tr><td data-l="단계">${n}단계 (-${d}%)</td><td data-l="발동 가격">${usd(p)}</td><td data-l="투입금">${usd(a)}</td><td data-l="수량">${q}주</td><td data-l="상태" class="${hit&&!done?"buy":""}">${done?"체결 완료":hit?"조건 도달":"대기"}</td><td class="w">${done||q<1?"":`<button class="mini" data-t="${n}">체결 입력</button> <button class="mini" data-ts="${n}">토스 주문</button>`}</td></tr>`;
   }).join("");
@@ -466,6 +466,7 @@ async function tsCheck(){
   tsStat("확인 중...");
   try{
     const j=await tsFetch("/status?check=1"),h=(j.holdings||[]).find(x=>String(x.symbol).toUpperCase()===SYM),D=derive();
+    if(h&&h.lastPrice>0){LASTPX=+h.lastPrice;render()}
     tsStat(`연결됨 · ${j.live?"실거래 모드":"모의 실행 모드"} · 매수 1건 한도 ${usd(j.maxOrderUsd)}, 하루 ${usd(j.maxDailyBuyUsd)} · 토스 보유 ${h?h.quantity+"주 (평단 "+usd(h.averagePurchasePrice)+")":"없음"} / 기록상 ${D.qty}주${D.qty>0?" (평단 "+usd(D.avg)+")":""}`+((h?h.quantity:0)!==D.qty?" · ⚠ 보유 수량이 기록과 다릅니다":""),(h?h.quantity:0)!==D.qty);
   }catch(e){tsStat("연결 실패: "+e.message,true)}
 }
@@ -516,6 +517,8 @@ async function tsSync(auto){
     // 연결 표시(oids) 변경도 저장해야 다음에 다시 비교하지 않음
     const changed=added||linked||fixed;
     if(changed){save();render()}
+    // 예비금 발동 여부 판단용 현재가 (토스 보유 종목 현재가)
+    try{const st=await tsFetch("/status?check=1"),h=(st.holdings||[]).find(x=>String(x.symbol).toUpperCase()===SYM);if(h&&h.lastPrice>0){LASTPX=+h.lastPrice;render()}}catch(e){}
     const D=derive(),tossQty=fills.reduce((s,f)=>s+(f.side2==="sell"?-f.q:f.q),0);
     tsStat(`토스 체결 이력(${from} 이후 주문) 확인 · 새로 추가 ${added}건, 기존 기록과 연결 ${linked}건${fixed?`, 날짜 수정 ${fixed}건`:""} · 기록상 보유 ${D.qty}주`+(D.qty!==tossQty?` (토스 체결 합계 ${tossQty}주와 다름: 이 기간 이전 거래나 직접 입력만 있는 기록을 확인하세요)`:""),D.qty!==tossQty);
     tsBusy=false;
