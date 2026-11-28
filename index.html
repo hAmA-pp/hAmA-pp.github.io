@@ -148,11 +148,10 @@ td button{width:100%}
 <label>체결 가격 ($)<input type="number" id="fp" step="any"></label>
 <label>수량 (주)<input type="number" id="fq" step="1"></label>
 <label>메모<input type="text" id="fm"></label>
-<label>기록 후 T (선택)<input type="number" id="ftv" step="any" placeholder="비우면 자동"></label>
 </div>
 <p class="note" id="tprev"></p>
 <div class="row"><button class="pri" id="add">기록 추가</button><button class="ghsave">GitHub에 저장</button><span class="note" id="fmsg"></span></div>
-<p class="note">T 기록 규칙: 매수는 T에 (매수금 ÷ 그때의 1회 매수금)을 더하고, 일부 매도는 T × (남은 수량 ÷ 기존 수량)으로 줄이며(쿼터 매도는 ×0.75), 전량 매도는 T를 0으로 되돌립니다. 예비금 매수는 T를 바꾸지 않습니다. 원문 값과 다르면 “기록 후 T” 칸에 직접 입력하세요. 현재 T는 체결 기록으로 자동 계산됩니다.</p>
+<p class="note">T 기록 규칙: 매수는 T에 (매수금 ÷ 그때의 1회 매수금)을 더하고, 일부 매도는 T × (남은 수량 ÷ 기존 수량)으로 줄이며(쿼터 매도는 ×0.75), 전량 매도는 T를 0으로 되돌립니다. 예비금 매수는 T를 바꾸지 않습니다. T는 체결 기록으로 자동 계산됩니다.</p>
 <p class="note">이미 보유 중인 포지션이 있다면 과거 체결을 같은 방식으로 입력하세요. 주문 표의 “체결 입력” 버튼을 누르면 가격과 수량이 자동으로 채워집니다.</p>
 </section>
 
@@ -349,7 +348,7 @@ function render(){
 function fill(side,p,q,tier,memo){
   unfold($("fform"));
   $("fd").value=today();$("fs").value=side;$("ft").value=tier||1;$("ftw").style.display=side==="reserve"?"":"none";
-  $("fp").value=p;$("fq").value=q;$("fm").value=memo||"";$("ftv").value="";$("fmsg").textContent="";updatePrev();
+  $("fp").value=p;$("fq").value=q;$("fm").value=memo||"";$("fmsg").textContent="";updatePrev();
   $("fform").scrollIntoView({behavior:"smooth"});
 }
 document.addEventListener("click",ev=>{
@@ -367,22 +366,21 @@ $("fs").addEventListener("change",()=>{$("ftw").style.display=$("fs").value==="r
 $("add").addEventListener("click",()=>{
   const d=$("fd").value,side=$("fs").value,p=num($("fp").value),q=Math.floor(num($("fq").value)||0);
   if(!d||!(p>0)||q<1){$("fmsg").textContent="날짜, 가격, 수량(1주 이상)을 확인하세요.";return}
-  const tv=num($("ftv").value);
-  E.push({ts:Date.now(),d,side,p,q,tier:side==="reserve"?+$("ft").value:0,memo:$("fm").value.trim(),t:tv==null?undefined:tv});
-  $("fp").value="";$("fq").value="";$("fm").value="";$("ftv").value="";$("fmsg").textContent="기록을 추가했습니다.";
+  E.push({ts:Date.now(),d,side,p,q,tier:side==="reserve"?+$("ft").value:0,memo:$("fm").value.trim()});
+  $("fp").value="";$("fq").value="";$("fm").value="";$("fmsg").textContent="기록을 추가했습니다.";
   save();render();
 });
 function updatePrev(){
   const el=$("tprev");if(!el)return;
   const d=$("fd").value||today(),side=$("fs").value,p=num($("fp").value),q=Math.floor(num($("fq").value)||0);
   if(!(p>0)||q<1){el.textContent="";return}
-  const tv=num($("ftv").value),cur=derive(),tmp={ts:Number.MAX_SAFE_INTEGER,d,side,p,q,tier:+$("ft").value,memo:"",t:tv==null?undefined:tv};
+  const cur=derive(),tmp={ts:Number.MAX_SAFE_INTEGER,d,side,p,q,tier:+$("ft").value,memo:""};
   const bk=E;E=E.concat([tmp]);const nx=derive();E=bk;
   const end=nx.cycles.length>cur.cycles.length;
-  el.textContent=`현재 T ${cur.T.toFixed(2)} → 기록 후 T ${(nx.Ta[tmp.ts]||0).toFixed(2)}${tv!=null&&!end?" (직접 입력)":""}${end?" · 전량 매도로 사이클 종료":""}`;
+  el.textContent=`현재 T ${cur.T.toFixed(2)} → 기록 후 T ${(nx.Ta[tmp.ts]||0).toFixed(2)}${end?" · 전량 매도로 사이클 종료":""}`;
 }
 const _render=render;render=function(){_render();updatePrev()};
-["fd","fs","ft","fp","fq","ftv"].forEach(i=>{$(i).addEventListener("input",updatePrev);$(i).addEventListener("change",updatePrev)});
+["fd","fs","ft","fp","fq"].forEach(i=>{$(i).addEventListener("input",updatePrev);$(i).addEventListener("change",updatePrev)});
 ids.forEach(i=>$(i).addEventListener("input",()=>{S[i]=$(i).value;save();render()}));
 ["m01","re"].forEach(i=>$(i).addEventListener("change",()=>{S[i]=$(i).checked;save();render()}));
 $("fd").value=today();
