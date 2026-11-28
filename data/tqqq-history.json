@@ -1,6 +1,6 @@
 {
  "v": 1,
- "savedAt": "2026-11-28T10:07:46.198Z",
+ "savedAt": "2026-11-28T10:11:31.490Z",
  "settings": {
   "total": "11232.44",
   "rp": "0",
@@ -27,7 +27,10 @@
    "p": 59.46,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6RDFvxTaV4fcqEUY6ZC9zMRzk4iPqj3x7xD_u9g0aN5A"
+   ]
   },
   {
    "ts": 1795432049919,
@@ -36,7 +39,10 @@
    "p": 60.55,
    "q": 2,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6dN9_uTl5gLJTiVAG0K0zUw1I519RsUxR_-D6XtjY7zJ"
+   ]
   },
   {
    "ts": 1795432068624,
@@ -45,7 +51,10 @@
    "p": 62.24,
    "q": 2,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6ZJZjT-VMfCvsg7LdRZVn3uUtSia1LQ3z9AsbN-WxbAN"
+   ]
   },
   {
    "ts": 1795432078865,
@@ -54,7 +63,11 @@
    "p": 50.46,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6eIDjufG3GMKKIOz01YEjQMAPCU4IJUnYVqedr86StMQ",
+    "EbbUX6nDWBqxysLHo4aP6eIDjufG3GMKKIOz01YEjQOgMLxtUo_LOv8uQtU7svrf"
+   ]
   },
   {
    "ts": 1795432091943,
@@ -63,7 +76,11 @@
    "p": 52.25,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6YU7kbsfBms9b5hsO2GwmDKwyC8pfirTU7_i7foVsk6e",
+    "EbbUX6nDWBqxysLHo4aP6YU7kbsfBms9b5hsO2GwmDJvhKe_hsYnpGoGZaSlrFTy"
+   ]
   },
   {
    "ts": 1795432109612,
@@ -72,7 +89,10 @@
    "p": 56.56,
    "q": 2,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6Wj8RGbvYSk91ArYxt6s_KbvJ7Nk2P0gCJ1ESBrp33eD"
+   ]
   },
   {
    "ts": 1795432138916,
@@ -81,7 +101,10 @@
    "p": 59.88,
    "q": 2,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6UZr__v6ZyQs__wpU9ihVzXrHxCW95imuoPoAHK9ggBy"
+   ]
   },
   {
    "ts": 1795432145690,
@@ -90,7 +113,10 @@
    "p": 60.3,
    "q": 2,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6Ucsk5_AhWeCKQqwbLK3ECqgBBZxmquiO3PCYQewgA-M"
+   ]
   },
   {
    "ts": 1795432156138,
@@ -99,7 +125,10 @@
    "p": 57.68,
    "q": 2,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6Tu9cDJWdpbLPU_TsJZCFtWXGvjIQCKTFUv67rgbkuJE"
+   ]
   },
   {
    "ts": 1795432168818,
@@ -108,7 +137,11 @@
    "p": 53.03,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6e5hryiIsDtv9X7y8UA0ZWmS4_zDupbYimo3uWkKv6R3",
+    "EbbUX6nDWBqxysLHo4aP6e5hryiIsDtv9X7y8UA0ZWnIiki6DbgFuD_0Q0t4H96P"
+   ]
   },
   {
    "ts": 1795432176913,
@@ -117,7 +150,11 @@
    "p": 51.81,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6an6mO4IkqoZ4vPPbXF5URjuSjdHvVj4-9L3QQZlBZ6m",
+    "EbbUX6nDWBqxysLHo4aP6an6mO4IkqoZ4vPPbXF5URjTUEC43TdIcInMXKuCMLCO"
+   ]
   },
   {
    "ts": 1795432188866,
@@ -126,7 +163,11 @@
    "p": 52.44,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6QGV99Edb4PGo-wukmwzXsaX5Awzm2e_QQY-d8x1qQeb",
+    "EbbUX6nDWBqxysLHo4aP6QGV99Edb4PGo-wukmwzXsb2ZMJctTVvH6Y4OsRDTrki"
+   ]
   },
   {
    "ts": 1795432201818,
@@ -135,7 +176,11 @@
    "p": 49.01,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6b_yqQqSwTeazQbUABSh4EtLEyVdfglFo-zMFL_ivUiT",
+    "EbbUX6nDWBqxysLHo4aP6b_yqQqSwTeazQbUABSh4Etr7Pjgfoyt_J4_tbdazN3L"
+   ]
   },
   {
    "ts": 1795432212642,
@@ -144,7 +189,10 @@
    "p": 41.2,
    "q": 4,
    "tier": 0,
-   "memo": ""
+   "memo": "",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6WDP8QZaO08TVtaCH4fV7puSNIefYRonH36Vi8l16qj6"
+   ]
   },
   {
    "ts": 1795474475004,
@@ -153,7 +201,10 @@
    "p": 49.1,
    "q": 2,
    "tier": 0,
-   "memo": "LOC 평단 0.5회"
+   "memo": "LOC 평단 0.5회",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6el8WqGDMi3JM436pdtItTR-70rkhx8i-NwIuZTB3Ke1"
+   ]
   },
   {
    "ts": 1795474487910,
@@ -162,7 +213,10 @@
    "p": 49.1,
    "q": 2,
    "tier": 0,
-   "memo": "LOC 별가 0.5회"
+   "memo": "LOC 별가 0.5회",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6el8WqGDMi3JM436pdtItTR-70rkhx8i-NwIuZTB3Ke1"
+   ]
   },
   {
    "ts": 1795559996988,
@@ -171,7 +225,10 @@
    "p": 46.19,
    "q": 2,
    "tier": 0,
-   "memo": "LOC 평단 0.5회"
+   "memo": "LOC 평단 0.5회",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6VyopHJHFfQWtl3bMvrshZke-uN7uZhwO3g-KxHnZNc-"
+   ]
   },
   {
    "ts": 1795560015660,
@@ -180,7 +237,10 @@
    "p": 46.19,
    "q": 2,
    "tier": 0,
-   "memo": "LOC 별가 0.5회"
+   "memo": "LOC 별가 0.5회",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6VyopHJHFfQWtl3bMvrshZnyVwCn205oe_acaDBAgpOU"
+   ]
   },
   {
    "ts": 1795683354625,
@@ -189,7 +249,10 @@
    "p": 45.28,
    "q": 2,
    "tier": 0,
-   "memo": "LOC 평단 0.5회"
+   "memo": "LOC 평단 0.5회",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6Wq24tDWiltNxZ7p5yor503fFEX_lrtyIsURmVVKv074"
+   ]
   },
   {
    "ts": 1795683365312,
@@ -198,11 +261,14 @@
    "p": 45.28,
    "q": 2,
    "tier": 0,
-   "memo": "LOC 별가 0.5회"
+   "memo": "LOC 별가 0.5회",
+   "oids": [
+    "EbbUX6nDWBqxysLHo4aP6Wq24tDWiltNxZ7p5yor503K1MIKM1c7SHpaVKOA_j3C"
+   ]
   },
   {
    "ts": 1795802402404,
-   "d": "2026-11-28",
+   "d": "2026-11-27",
    "side": "buy",
    "p": 48.85,
    "q": 2,
@@ -212,7 +278,7 @@
   },
   {
    "ts": 1795802402460,
-   "d": "2026-11-28",
+   "d": "2026-11-27",
    "side": "buy",
    "p": 48.85,
    "q": 2,
