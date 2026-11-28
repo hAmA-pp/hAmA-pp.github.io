@@ -1,6 +1,6 @@
 {
  "v": 1,
- "savedAt": "2026-11-26T08:56:09.607Z",
+ "savedAt": "2026-11-28T10:07:46.198Z",
  "settings": {
   "total": "11232.44",
   "rp": "0",
@@ -16,7 +16,8 @@
   "d2": 25,
   "d3": 35,
   "s1": 25,
-  "s2": 25
+  "s2": 25,
+  "tossFrom": "2026-11-26"
  },
  "entries": [
   {
@@ -198,6 +199,26 @@
    "q": 2,
    "tier": 0,
    "memo": "LOC 별가 0.5회"
+  },
+  {
+   "ts": 1795802402404,
+   "d": "2026-11-28",
+   "side": "buy",
+   "p": 48.85,
+   "q": 2,
+   "tier": 0,
+   "memo": "토스 자동 · LOC (앱에서 직접 주문)",
+   "oid": "EbbUX6nDWBqxysLHo4aP6UArct1BFlmamSz1SEWI_EPLVFEHLY1rE1pD4UAatEDX"
+  },
+  {
+   "ts": 1795802402460,
+   "d": "2026-11-28",
+   "side": "buy",
+   "p": 48.85,
+   "q": 2,
+   "tier": 0,
+   "memo": "토스 자동 · LOC (앱에서 직접 주문)",
+   "oid": "EbbUX6nDWBqxysLHo4aP6UArct1BFlmamSz1SEWI_ENEwTcDRGuAnytNyjqiF-by"
   }
  ]
 }
